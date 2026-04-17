@@ -1,92 +1,73 @@
 import Link from "next/link";
 import { db } from "@/lib/db/store";
+import { Card, LegendItem, StratBar } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Products" };
 
+function usd(n: number) { return "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
+
 export default async function AdminProducts() {
-  const [products, positions] = await Promise.all([
-    db.listProducts(),
-    db.listPositions(),
-  ]);
+  const [products, positions] = await Promise.all([db.listProducts(), db.listPositions()]);
 
   return (
     <div>
-      <h1 style={{ margin: "0 0 6px", fontSize: 22 }}>Products</h1>
-      <p style={{ color: "#6B7280", margin: "0 0 24px", fontSize: 13 }}>
-        Manage vault products. Clients see these on the Invest page (read-only).
-      </p>
+      <h1 className="m-0 mb-1 text-[22px] font-bold">Products</h1>
+      <p className="text-muted text-[13px] mt-0 mb-6">Manage vault products. Clients see these on the Invest page (read-only).</p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div className="flex flex-col gap-4">
         {products.map((p) => {
           const posCount = positions.filter((pos) => pos.productSlug === p.slug).length;
-          const tvl = positions
-            .filter((pos) => pos.productSlug === p.slug)
-            .reduce((a, pos) => a + pos.currentValueUsd, 0);
+          const tvl      = positions.filter((pos) => pos.productSlug === p.slug).reduce((a, pos) => a + pos.currentValueUsd, 0);
 
           return (
-            <div key={p.id} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 24 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+            <Card key={p.id}>
+              <div className="flex justify-between items-start mb-4">
                 <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                    <h2 style={{ margin: 0, fontSize: 18 }}>{p.name}</h2>
-                    <span style={{
-                      fontSize: 11, fontWeight: 600, padding: "2px 10px", borderRadius: 999,
-                      background: p.status === "live" ? "#E6F7EC" : p.status === "paused" ? "#FEF3C7" : "#F1F3F5",
-                      color: p.status === "live" ? "#1a7f3b" : p.status === "paused" ? "#92400E" : "#6B7280",
-                    }}>
+                  <div className="flex items-center gap-2.5 mb-1.5">
+                    <h2 className="m-0 text-[18px] font-semibold">{p.name}</h2>
+                    <span
+                      className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                      style={{
+                        background: p.status === "live" ? "#E6F7EC" : p.status === "paused" ? "#FEF3C7" : "#F1F3F5",
+                        color:      p.status === "live" ? "#1a7f3b" : p.status === "paused" ? "#92400E" : "#6B7280",
+                      }}
+                    >
                       {p.status.toUpperCase()}
                     </span>
                   </div>
-                  <div style={{ color: "#6B7280", fontSize: 13 }}>{p.lead}</div>
+                  <div className="text-muted text-[13px]">{p.lead}</div>
                 </div>
-                <Link
-                  href={`/admin/products/${p.slug}`}
-                  style={{ background: "#111827", color: "#fff", padding: "8px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: "none" }}
-                >
-                  Edit →
-                </Link>
+                <Link href={`/admin/products/${p.slug}`} className="btn btn-dark btn-sm">Edit →</Link>
               </div>
 
-              {/* Stats grid */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: 12, marginBottom: 16 }}>
+              {/* Stats */}
+              <div className="grid-6" style={{ marginBottom: 16 }}>
                 {[
-                  { k: "APY", v: `${p.apy}%` },
-                  { k: "Lock", v: `${p.lockMonths / 12}y` },
-                  { k: "Min deposit", v: "$" + p.minDeposit.toLocaleString() },
-                  { k: "Target", v: `${p.cumulativeTargetPct}%` },
+                  { k: "APY",       v: `${p.apy}%` },
+                  { k: "Lock",      v: `${p.lockMonths / 12}y` },
+                  { k: "Min dep.",  v: usd(p.minDeposit) },
+                  { k: "Target",    v: `${p.cumulativeTargetPct}%` },
                   { k: "Positions", v: posCount },
-                  { k: "TVL", v: "$" + Math.round(tvl / 1000) + "k" },
+                  { k: "TVL",       v: "$" + Math.round(tvl / 1000) + "k" },
                 ].map(({ k, v }) => (
-                  <div key={k} style={{ textAlign: "center", background: "#F7F8FA", borderRadius: 8, padding: "10px 6px" }}>
-                    <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".06em", color: "#6B7280", fontWeight: 600, marginBottom: 4 }}>{k}</div>
-                    <div style={{ fontSize: 15, fontWeight: 700 }}>{v}</div>
+                  <div key={k} className="text-center bg-[#F7F8FA] rounded-[8px] py-2.5 px-1.5">
+                    <div className="label-upper mb-1">{k}</div>
+                    <div className="text-[15px] font-bold">{v}</div>
                   </div>
                 ))}
               </div>
 
               {/* Pockets */}
-              <div>
-                <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "#6B7280", fontWeight: 600, marginBottom: 8 }}>Strategy pockets</div>
-                <div style={{ display: "flex", height: 10, borderRadius: 999, overflow: "hidden", background: "#F1F3F5", marginBottom: 6 }}>
-                  {p.pockets.map((pk) => (
-                    <span key={pk.label} style={{ width: `${pk.pct}%`, background: pk.color, display: "block" }} />
-                  ))}
-                </div>
-                <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 12, color: "#6B7280" }}>
-                  {p.pockets.map((pk) => (
-                    <span key={pk.label}>
-                      <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 3, marginRight: 5, verticalAlign: "middle", background: pk.color }} />
-                      {pk.label} · {pk.pct}%
-                    </span>
-                  ))}
-                </div>
+              <div className="label-upper mb-2">Strategy pockets</div>
+              <StratBar mix={p.pockets.map((pk) => ({ color: pk.color, weight: pk.pct }))} />
+              <div className="flex flex-wrap gap-x-3.5 gap-y-1 mt-1.5 mb-2">
+                {p.pockets.map((pk) => <LegendItem key={pk.label} color={pk.color} label={`${pk.label} · ${pk.pct}%`} />)}
               </div>
-
-              <div style={{ marginTop: 12, fontSize: 12, color: "#9CA3AF" }}>
+              <div className="text-faint text-[12px] mt-2">
                 Fees: {p.feesMgmtPct}% mgmt + {p.feesPerfPct}% perf · {p.network} · Regime: {p.activeRegime}
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>

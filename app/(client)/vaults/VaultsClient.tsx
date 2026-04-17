@@ -2,158 +2,88 @@
 
 import { useState } from "react";
 import { YieldBarChart } from "@/components/charts/YieldBarChart";
-import type { Position, Product, Transaction } from "@/lib/db/types";
-import type { ScenarioType } from "@/lib/db/types";
+import { Card, Kpi, Label, LegendItem, Pill, ProgressBar, StratBar, TxRow } from "@/components/ui";
+import type { Position, Product, ScenarioType, Transaction } from "@/lib/db/types";
+import { formatDate } from "@/lib/format";
 
-function usd(n: number, fractions = 0) {
-  return "$" + n.toLocaleString("en-US", { maximumFractionDigits: fractions });
-}
-function productName(slug: string) {
-  return slug === "prime" ? "HashVault Prime" : "HashVault Growth";
-}
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-}
-function shortHash(h: string) {
-  return h.slice(0, 4) + "…" + h.slice(-2);
-}
+function usd(n: number) { return "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
+function productName(slug: string) { return slug === "prime" ? "HashVault Prime" : "HashVault Growth"; }
 
 const REGIME_LABEL: Record<ScenarioType, string> = {
   bull: "Bull — accelerate growth",
   flat: "Sideways — baseline mix",
   bear: "Bear — protect capital",
 };
-const REGIME_SHORT: Record<ScenarioType, string> = {
-  bull: "Bull",
-  flat: "Sideways",
-  bear: "Bear",
-};
+const REGIME_SHORT: Record<ScenarioType, string> = { bull: "Bull", flat: "Sideways", bear: "Bear" };
+const SCENARIO_BG:    Record<ScenarioType, string> = { bull: "#E6F7EC", flat: "#F1F3F5", bear: "#FEE4E2" };
+const SCENARIO_COLOR: Record<ScenarioType, string> = { bull: "#1a7f3b", flat: "#111827", bear: "#9A2313" };
+const TX_ICON:  Record<string, string> = { yield: "↓", fee: "−", deposit: "+", withdraw: "↑", claim: "↓" };
+const TX_BG:    Record<string, string> = { yield: "#e6f7ec", fee: "#FDECEC", deposit: "#EEF2FF", withdraw: "#EEF2FF", claim: "#e6f7ec" };
+const TX_COLOR: Record<string, string> = { yield: "#1a7f3b", fee: "#991B1B", deposit: "#3730A3", withdraw: "#3730A3", claim: "#1a7f3b" };
 
-type Props = {
-  positions: Position[];
-  products: Product[];
-  transactions: Transaction[];
-};
-
-function VaultCard({
-  pos,
-  index,
-  product,
-  txs,
-}: {
-  pos: Position;
-  index: number;
-  product: Product;
-  txs: Transaction[];
-}) {
-  const [activeRegime, setActiveRegime] = useState<ScenarioType>(product.activeRegime);
+function VaultCard({ pos, index, product, txs }: { pos: Position; index: number; product: Product; txs: Transaction[] }) {
+  const [regime, setRegime] = useState<ScenarioType>(product.activeRegime);
   const [txExpanded, setTxExpanded] = useState(false);
-  const [stratOpen, setStratOpen] = useState(false);
 
-  const scenario = product.scenarios.find((s) => s.type === activeRegime)!;
-  const totalWeight = scenario.mix.reduce((a, m) => a + m.weight, 0);
+  const scenario  = product.scenarios.find((s) => s.type === regime)!;
+  const gain      = pos.currentValueUsd - pos.amountUsd;
+  const progPct   = Math.min(100, (pos.cumulativeProgressPct / product.cumulativeTargetPct) * 100);
 
-  const visibleTxs = txExpanded ? txs : txs.slice(0, 3);
-  const gain = pos.currentValueUsd - pos.amountUsd;
-
-  // Chart data — last months yield
-  const yieldTxs = txs.filter((t) => t.type === "yield").slice(0, 12).reverse();
-  const barLabels = yieldTxs.map((t) =>
-    new Date(t.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }),
-  );
+  const yieldTxs  = txs.filter((t) => t.type === "yield").slice(0, 12).reverse();
+  const barLabels = yieldTxs.map((t) => new Date(t.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }));
   const barValues = yieldTxs.map((t) => t.amountUsd);
-
-  const txIcon: Record<string, string> = {
-    yield: "↓",
-    fee: "−",
-    deposit: "+",
-    withdraw: "↑",
-    claim: "↓",
-  };
-  const txBg: Record<string, string> = {
-    yield: "var(--green-soft)",
-    fee: "#FDECEC",
-    deposit: "#EEF2FF",
-    withdraw: "#EEF2FF",
-    claim: "var(--green-soft)",
-  };
-  const txColor: Record<string, string> = {
-    yield: "var(--green-strong)",
-    fee: "#991B1B",
-    deposit: "#3730A3",
-    withdraw: "#3730A3",
-    claim: "var(--green-strong)",
-  };
+  const visibleTxs = txExpanded ? txs : txs.slice(0, 3);
 
   return (
-    <div
-      id={pos.id}
-      className="card"
-      style={{ marginBottom: 16 }}
-    >
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 10 }}>
+    <Card id={pos.id} style={{ marginBottom: 16 }}>
+      {/* header */}
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <span className="pill"><span className="dot-live" />LIVE</span>
-          <h2 style={{ margin: "8px 0 2px" }}>
-            {productName(pos.productSlug)} #{index}
-          </h2>
-          <div className="muted" style={{ fontSize: 12 }}>
+          <Pill />
+          <h2 className="text-[16px] font-semibold my-2">{productName(pos.productSlug)} #{index}</h2>
+          <p className="text-muted text-[12px] m-0">
             {product.pockets.map((pk) => pk.label).join(" · ")}
-            {index > 1 ? " · additional position" : ""}
-          </div>
+            {index > 1 && " · additional position"}
+          </p>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div className="kpi">
-            {product.apy}%<small style={{ fontSize: 13, color: "var(--muted)", marginLeft: 4 }}>APY</small>
-          </div>
-          <div className="muted" style={{ fontSize: 12 }}>Daily distribution</div>
+        <div className="text-right">
+          <div className="kpi-lg">{product.apy}<small className="text-[14px] font-semibold text-muted ml-1">% APY</small></div>
+          <p className="text-muted text-[12px] m-0">Daily distribution</p>
         </div>
       </div>
 
-      {/* KPIs 4 cols */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 16 }}>
+      {/* KPIs */}
+      <div className="grid-4 mb-4">
+        <div><Label>Deposited</Label><Kpi size="sm" value={usd(pos.amountUsd)} /></div>
         <div>
-          <div className="h-uppercase" style={{ marginBottom: 4 }}>Deposited</div>
-          <div className="kpi sm">{usd(pos.amountUsd)}</div>
+          <Label>Current value</Label>
+          <Kpi size="sm" value={usd(pos.currentValueUsd)} sub={<span className="text-pos">+{usd(gain)}</span>} />
         </div>
-        <div>
-          <div className="h-uppercase" style={{ marginBottom: 4 }}>Current value</div>
-          <div className="kpi sm">{usd(pos.currentValueUsd)}</div>
-          <div className="pos" style={{ fontSize: 12 }}>+{usd(gain)}</div>
-        </div>
-        <div>
-          <div className="h-uppercase" style={{ marginBottom: 4 }}>Yield paid</div>
-          <div className="kpi sm">{usd(pos.yieldPaidUsd)}</div>
-          <div className="muted" style={{ fontSize: 12 }}>USDC</div>
-        </div>
-        <div>
-          <div className="h-uppercase" style={{ marginBottom: 4 }}>Matures</div>
-          <div className="kpi sm">{fmtDate(pos.maturesAt)}</div>
-          <div className="muted" style={{ fontSize: 12 }}>{product.lockMonths / 12}-year lock</div>
-        </div>
+        <div><Label>Yield paid</Label><Kpi size="sm" value={usd(pos.yieldPaidUsd)} sub="USDC" /></div>
+        <div><Label>Matures</Label><Kpi size="sm" value={formatDate(pos.maturesAt)} sub={`${product.lockMonths / 12}-year lock`} /></div>
       </div>
 
-      {/* Progress */}
-      <div style={{ marginBottom: 18 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-          <strong>Cumulative target progress</strong>
-          <span className="muted">{pos.cumulativeProgressPct}% of {product.cumulativeTargetPct}%</span>
+      {/* progress */}
+      <div className="mb-4">
+        <div className="flex justify-between mb-1.5">
+          <strong className="text-[13px]">Cumulative target progress</strong>
+          <span className="text-muted text-[12px]">{pos.cumulativeProgressPct}% of {product.cumulativeTargetPct}%</span>
         </div>
-        <div className="progress">
-          <span style={{ width: `${(pos.cumulativeProgressPct / product.cumulativeTargetPct) * 100}%` }} />
-        </div>
-        <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
-          Your <strong>invested capital</strong> unlocks for withdrawal when the cumulative target is reached{" "}
-          <em>or</em> at {product.lockMonths / 12}-year maturity, whichever comes first. Yield is distributed
-          daily throughout the lock period.
-        </div>
+        <ProgressBar
+          pct={progPct}
+          hint={
+            <span>
+              Your <strong>invested capital</strong> unlocks for withdrawal when the cumulative target is reached <em>or</em>{" "}
+              at {product.lockMonths / 12}-year maturity, whichever comes first. Yield is distributed daily throughout the lock period.
+            </span>
+          }
+        />
       </div>
 
-      {/* Yield chart + safeguard */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+      {/* yield chart + safeguard */}
+      <div className="grid-2 mb-4">
         <div>
-          <div className="h-uppercase" style={{ marginBottom: 6 }}>Yield paid — last months</div>
+          <Label>Yield paid — last months</Label>
           <YieldBarChart
             labels={barLabels}
             values={barValues}
@@ -161,213 +91,125 @@ function VaultCard({
           />
         </div>
         <div>
-          <div className="h-uppercase" style={{ marginBottom: 6 }}>Capital recovery status</div>
-          <div
-            className="card"
-            style={{ marginTop: 8, background: "#F9FFF8", borderColor: "#CFEAD8" }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <strong style={{ color: "var(--green-strong)" }}>✓ Safeguard active — not triggered</strong>
-              <span className="pill">auto</span>
+          <Label>Capital recovery status</Label>
+          <Card className="mt-2 !bg-[#F9FFF8] !border-[#CFEAD8]">
+            <div className="flex justify-between items-center">
+              <strong className="text-[#1a7f3b] text-[13px]">✓ Safeguard active — not triggered</strong>
+              <Pill />
             </div>
-            <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
-              If principal is below initial deposit at maturity, HashVault mining infrastructure
-              continues to operate for up to 2 additional years, with mining output directed
-              exclusively to restoring capital.
-            </div>
-          </div>
+            <p className="text-muted text-[12px] mt-1.5">
+              If principal is below initial deposit at maturity, HashVault mining infrastructure continues to operate
+              for up to 2 additional years, with mining output directed exclusively to restoring capital.
+            </p>
+          </Card>
         </div>
       </div>
 
-      {/* Note for index > 1 */}
+      {/* note for index > 1 */}
       {index > 1 && (
-        <div
-          className="muted"
-          style={{ fontSize: 12, marginBottom: 12, background: "#F3F8FF", border: "1px solid #C7D9F1", borderRadius: 10, padding: "10px 14px" }}
-        >
-          <strong>Note:</strong> This is a second entry into {productName(pos.productSlug)}. It follows the{" "}
-          <em>same</em> strategy mix and rules as Position #1, but runs on its own{" "}
-          {product.lockMonths / 12}-year timeline starting {fmtDate(pos.startedAt)}.
-        </div>
+        <p className="text-[12px] text-muted bg-[#F3F8FF] border border-[#C7D9F1] rounded-[10px] p-3 mb-3">
+          <strong>Note:</strong> This is a second entry into {productName(pos.productSlug)}. It follows the <em>same</em>{" "}
+          strategy mix and rules as Position #1, but runs on its own {product.lockMonths / 12}-year timeline starting{" "}
+          {formatDate(pos.startedAt)}.
+        </p>
       )}
 
-      {/* Strategy details */}
+      {/* strategy details */}
       {index === 1 && (
-        <details style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", marginBottom: 10, background: "#FAFBFC" }}
-          onToggle={(e) => setStratOpen((e.target as HTMLDetailsElement).open)}
-        >
-          <summary style={{ cursor: "pointer", fontWeight: 600, listStyle: "none" }}>
-            Strategy details
-          </summary>
-          {stratOpen && (
-            <div style={{ marginTop: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--muted)", marginBottom: 4 }}>
-                Current market regime:{" "}
-                <strong style={{ color: "var(--dark)" }}>{REGIME_LABEL[activeRegime]}</strong>
-                <span style={{ fontSize: 11 }}>· Click any scenario below to preview its allocation</span>
-              </div>
-              {/* Strategy bar */}
-              <div style={{ display: "flex", height: 10, borderRadius: 999, overflow: "hidden", background: "#F1F3F5", marginBottom: 8 }}>
-                {scenario.mix.map((m, i) => (
-                  <span
+        <details className="mb-2">
+          <summary>Strategy details</summary>
+          <div className="mt-3">
+            <p className="text-[12px] text-muted mb-2">
+              Current market regime: <strong className="text-dark">{REGIME_LABEL[regime]}</strong>
+              <span className="ml-2 text-[11px]">· Click any scenario below to preview its allocation</span>
+            </p>
+            <StratBar mix={scenario.mix} />
+            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 mb-4">
+              {scenario.mix.map((m, i) => {
+                const tw = scenario.mix.reduce((a, x) => a + x.weight, 0);
+                return (
+                  <LegendItem
                     key={i}
-                    style={{ width: `${(m.weight / totalWeight) * 100}%`, background: m.color, display: "block" }}
+                    color={m.color}
+                    label={`${product.pockets[i]?.label} · ${Math.round((m.weight / tw) * 100)}%`}
                   />
-                ))}
-              </div>
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 12, color: "var(--muted)", marginBottom: 16 }}>
-                {scenario.mix.map((m, i) => (
-                  <span key={i}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: 10,
-                        height: 10,
-                        borderRadius: 3,
-                        marginRight: 6,
-                        verticalAlign: "middle",
-                        background: m.color,
-                      }}
-                    />
-                    {product.pockets[i]?.label} · {Math.round((m.weight / totalWeight) * 100)}%
-                  </span>
-                ))}
-              </div>
-              {/* Scenario cards */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
-                {product.scenarios.map((s) => {
-                  const isActive = s.type === activeRegime;
-                  const tw = s.mix.reduce((a, m) => a + m.weight, 0);
-                  return (
-                    <div
-                      key={s.type}
-                      onClick={() => setActiveRegime(s.type)}
-                      style={{
-                        border: `1px solid ${isActive ? "var(--green)" : "var(--border)"}`,
-                        borderRadius: 10,
-                        padding: 12,
-                        background: isActive ? "#F4FCF6" : "#fff",
-                        boxShadow: isActive ? "0 0 0 3px rgba(52,199,89,.10)" : "none",
-                        cursor: "pointer",
-                        transition: "border-color .15s, box-shadow .15s, background .15s",
-                      }}
-                    >
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 6,
-                          fontSize: 11,
-                          fontWeight: 600,
-                          padding: "2px 8px",
-                          borderRadius: 999,
-                          textTransform: "uppercase",
-                          letterSpacing: ".05em",
-                          background:
-                            s.type === "bull" ? "#E6F7EC"
-                            : s.type === "bear" ? "#FEE4E2"
-                            : "#F1F3F5",
-                          color:
-                            s.type === "bull" ? "var(--green-strong)"
-                            : s.type === "bear" ? "#9A2313"
-                            : "var(--dark)",
-                        }}
-                      >
-                        ● {REGIME_SHORT[s.type]}
-                      </span>
-                      <h4 style={{ margin: "8px 0 4px", fontSize: 13 }}>{s.title}</h4>
-                      <p style={{ margin: 0, fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>
-                        {s.description}
-                      </p>
-                      <div style={{ display: "flex", height: 6, borderRadius: 999, overflow: "hidden", background: "#F1F3F5", marginTop: 10 }}>
-                        {s.mix.map((m, i) => (
-                          <span key={i} style={{ width: `${(m.weight / tw) * 100}%`, background: m.color, display: "block" }} />
-                        ))}
-                      </div>
-                      {isActive && (
-                        <div style={{ marginTop: 8, fontSize: 10, fontWeight: 700, color: "var(--green-strong)", letterSpacing: ".05em", textTransform: "uppercase" }}>
-                          ✓ Currently active
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                );
+              })}
             </div>
-          )}
+            <div className="grid-3">
+              {product.scenarios.map((s) => {
+                const isActive = s.type === regime;
+                return (
+                  <div key={s.type} className={`scn${isActive ? " active" : ""}`} onClick={() => setRegime(s.type)}>
+                    <span
+                      className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-[0.05em]"
+                      style={{ background: SCENARIO_BG[s.type], color: SCENARIO_COLOR[s.type] }}
+                    >
+                      ● {REGIME_SHORT[s.type]}
+                    </span>
+                    <h4 className="text-[13px] font-semibold my-2">{s.title}</h4>
+                    <p className="text-[12px] text-muted leading-relaxed m-0">{s.description}</p>
+                    <StratBar mix={s.mix} size="sm" />
+                    {isActive && (
+                      <p className="text-[10px] font-bold text-[#1a7f3b] uppercase tracking-widest mt-2 m-0">✓ Currently active</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </details>
       )}
 
-      {/* Transactions */}
-      <details style={{ border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", background: "#FAFBFC" }}>
-        <summary style={{ cursor: "pointer", fontWeight: 600, listStyle: "none" }}>Transactions</summary>
-        <div style={{ marginTop: 6 }}>
+      {/* transactions */}
+      <details>
+        <summary>Transactions</summary>
+        <div className="mt-1.5">
           {visibleTxs.map((t) => (
-            <div
+            <TxRow
               key={t.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "24px 1fr auto auto",
-                alignItems: "center",
-                gap: 12,
-                padding: "10px 0",
-                borderBottom: "1px solid var(--border)",
-                fontSize: 13,
-              }}
-            >
-              <div
-                style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: "50%",
-                  display: "grid",
-                  placeItems: "center",
-                  fontSize: 12,
-                  background: txBg[t.type] ?? "var(--green-soft)",
-                  color: txColor[t.type] ?? "var(--green-strong)",
-                }}
-              >
-                {txIcon[t.type]}
-              </div>
-              <div>
-                <strong>{t.note ?? (t.type === "yield" ? "Yield distribution" : t.type)}</strong>
-                <div className="muted" style={{ fontSize: 11 }}>
-                  {fmtDate(t.createdAt)} · tx {shortHash(t.txHash)}
-                </div>
-              </div>
-              <div className={t.amountUsd < 0 ? "neg" : t.type === "yield" ? "pos" : ""}>
-                {t.amountUsd >= 0 ? "+" : ""}
-                {t.amountUsd.toFixed(2)} USDC
-              </div>
-              <div className="muted">{t.frequency?.replace("one-off", "deposit") ?? ""}</div>
-            </div>
+              icon={TX_ICON[t.type] ?? "·"}
+              iconBg={TX_BG[t.type] ?? "#e6f7ec"}
+              iconColor={TX_COLOR[t.type] ?? "#1a7f3b"}
+              title={t.note ?? (t.type === "yield" ? "Yield distribution" : t.type)}
+              date={formatDate(t.createdAt)}
+              txHash={t.txHash}
+              amount={`${t.amountUsd >= 0 ? "+" : ""}${t.amountUsd.toFixed(2)} USDC`}
+              amountClass={t.amountUsd < 0 ? "text-neg" : t.type === "yield" ? "text-pos" : ""}
+              frequency={t.frequency?.replace("one-off", "deposit")}
+            />
           ))}
           {txs.length > 3 && (
-            <div style={{ textAlign: "center", marginTop: 10 }}>
-              <button className="btn ghost" onClick={() => setTxExpanded((v) => !v)}>
+            <div className="text-center mt-2.5">
+              <button className="btn btn-ghost btn-sm" onClick={() => setTxExpanded((v) => !v)}>
                 {txExpanded ? "Less ↑" : "More ↓"}
               </button>
             </div>
           )}
         </div>
       </details>
-    </div>
+    </Card>
   );
 }
 
-export function VaultsClient({ positions, products, transactions }: Props) {
-  const productIndexCounter: Record<string, number> = {};
+type Props = { positions: Position[]; products: Product[]; transactions: Transaction[] };
 
+export function VaultsClient({ positions, products, transactions }: Props) {
+  const counter: Record<string, number> = {};
   return (
     <div>
       {positions.map((pos) => {
         const product = products.find((p) => p.slug === pos.productSlug);
         if (!product) return null;
-        productIndexCounter[pos.productSlug] = (productIndexCounter[pos.productSlug] ?? 0) + 1;
-        const idx = productIndexCounter[pos.productSlug];
-        const txs = transactions.filter((t) => t.positionId === pos.id);
+        counter[pos.productSlug] = (counter[pos.productSlug] ?? 0) + 1;
         return (
-          <VaultCard key={pos.id} pos={pos} index={idx} product={product} txs={txs} />
+          <VaultCard
+            key={pos.id}
+            pos={pos}
+            index={counter[pos.productSlug]}
+            product={product}
+            txs={transactions.filter((t) => t.positionId === pos.id)}
+          />
         );
       })}
     </div>

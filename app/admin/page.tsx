@@ -1,124 +1,115 @@
+import Link from "next/link";
 import { db } from "@/lib/db/store";
+import { Card, SectionTitle, TxRow } from "@/components/ui";
+import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard" };
 
-function usd(n: number) {
-  return "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 });
-}
-function num(n: number) {
-  return n.toLocaleString("en-US");
-}
+function usd(n: number) { return "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
+
+const TX_ICON:  Record<string, string> = { yield: "↓", fee: "−", deposit: "+", withdraw: "↑" };
+const TX_BG:    Record<string, string> = { yield: "#E6F7EC", fee: "#FDECEC", deposit: "#EEF2FF", withdraw: "#EEF2FF" };
+const TX_COLOR: Record<string, string> = { yield: "#1a7f3b", fee: "#991B1B", deposit: "#3730A3", withdraw: "#3730A3" };
 
 export default async function AdminDashboard() {
   const [products, users, positions, txs] = await Promise.all([
-    db.listProducts(),
-    db.listUsers(),
-    db.listPositions(),
-    db.listTransactions({}),
+    db.listProducts(), db.listUsers(), db.listPositions(), db.listTransactions({}),
   ]);
 
-  const tvl = positions.reduce((a, p) => a + p.currentValueUsd, 0);
-  const deposits = positions.reduce((a, p) => a + p.amountUsd, 0);
+  const tvl       = positions.reduce((a, p) => a + p.currentValueUsd, 0);
+  const deposits  = positions.reduce((a, p) => a + p.amountUsd, 0);
   const yieldDist = txs.filter((t) => t.type === "yield").reduce((a, t) => a + t.amountUsd, 0);
-  const fees = txs.filter((t) => t.type === "fee").reduce((a, t) => a + Math.abs(t.amountUsd), 0);
+  const fees      = txs.filter((t) => t.type === "fee").reduce((a, t) => a + Math.abs(t.amountUsd), 0);
   const recentTxs = [...txs].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, 10);
 
   const kpis = [
-    { label: "Total Value Locked", value: usd(tvl), sub: "across all positions", color: "#34C759" },
-    { label: "Total Deposits", value: usd(deposits), sub: "capital committed", color: "#111827" },
-    { label: "Yield Distributed", value: usd(yieldDist), sub: "USDC paid out", color: "#F59E0B" },
-    { label: "Fees Collected", value: usd(fees), sub: "mgmt + perf", color: "#6B7280" },
+    { label: "Total Value Locked",  value: usd(tvl),       sub: "across all positions", accent: "#34C759" },
+    { label: "Total Deposits",      value: usd(deposits),  sub: "capital committed",    accent: "#111827" },
+    { label: "Yield Distributed",   value: usd(yieldDist), sub: "USDC paid out",        accent: "#F59E0B" },
+    { label: "Fees Collected",      value: usd(fees),      sub: "mgmt + perf",          accent: "#6B7280" },
   ];
 
-  const statLine = [
-    { label: "Products live", value: products.filter((p) => p.status === "live").length },
-    { label: "Users", value: num(users.length) },
-    { label: "Active positions", value: num(positions.length) },
-    { label: "Total transactions", value: num(txs.length) },
+  const stats = [
+    { label: "Products live",       value: products.filter((p) => p.status === "live").length },
+    { label: "Users",               value: users.length },
+    { label: "Active positions",    value: positions.length },
+    { label: "Total transactions",  value: txs.length },
   ];
-
-  const txTypeIcon: Record<string, string> = { yield: "↓", fee: "−", deposit: "+", withdraw: "↑" };
-  const txTypeBg: Record<string, string> = { yield: "#E6F7EC", fee: "#FDECEC", deposit: "#EEF2FF", withdraw: "#EEF2FF" };
-  const txTypeColor: Record<string, string> = { yield: "#1a7f3b", fee: "#991B1B", deposit: "#3730A3", withdraw: "#3730A3" };
 
   return (
     <div>
-      <h1 style={{ margin: "0 0 6px", fontSize: 22 }}>Admin Dashboard</h1>
-      <p style={{ color: "#6B7280", margin: "0 0 24px", fontSize: 13 }}>
-        Platform overview · all data from database.
-      </p>
+      <h1 className="m-0 mb-1 text-[22px] font-bold">Admin Dashboard</h1>
+      <p className="text-muted text-[13px] mt-0 mb-6">Platform overview · all data from database.</p>
 
       {/* KPI grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 24 }}>
+      <div className="grid-4" style={{ marginBottom: 24 }}>
         {kpis.map((k) => (
-          <div key={k.label} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 20, borderTop: `3px solid ${k.color}` }}>
-            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "#6B7280", fontWeight: 600, marginBottom: 6 }}>
-              {k.label}
-            </div>
-            <div style={{ fontSize: 26, fontWeight: 700, letterSpacing: "-.02em" }}>{k.value}</div>
-            <div style={{ fontSize: 12, color: "#6B7280", marginTop: 2 }}>{k.sub}</div>
+          <div
+            key={k.label}
+            className="card"
+            style={{ borderTop: `3px solid ${k.accent}`, padding: 20 }}
+          >
+            <div className="label-upper mb-1.5">{k.label}</div>
+            <div className="text-[26px] font-bold tracking-tight">{k.value}</div>
+            <div className="text-muted text-[12px] mt-0.5">{k.sub}</div>
           </div>
         ))}
       </div>
 
       {/* Stat line */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 24 }}>
-        {statLine.map((s) => (
-          <div key={s.label} style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 10, padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 13, color: "#6B7280" }}>{s.label}</span>
-            <strong style={{ fontSize: 18 }}>{s.value}</strong>
+      <div className="grid-4" style={{ marginBottom: 24 }}>
+        {stats.map((s) => (
+          <div key={s.label} className="card flex justify-between items-center" style={{ padding: "14px 18px" }}>
+            <span className="text-muted text-[13px]">{s.label}</span>
+            <strong className="text-[18px]">{s.value}</strong>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div className="grid-2">
         {/* Products */}
-        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 20 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <h2 style={{ margin: 0, fontSize: 15 }}>Products</h2>
-            <a href="/admin/products" style={{ fontSize: 12, color: "#1a7f3b", fontWeight: 600 }}>Manage →</a>
-          </div>
+        <Card>
+          <SectionTitle
+            title="Products"
+            right={<Link href="/admin/products" className="text-[12px] font-semibold text-[#1a7f3b]">Manage →</Link>}
+          />
           {products.map((p) => (
-            <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #E5E7EB", fontSize: 13 }}>
+            <div key={p.id} className="flex justify-between items-center py-2.5 border-b border-border last:border-0 text-[13px]">
               <div>
                 <strong>{p.name}</strong>
-                <div style={{ fontSize: 11, color: "#6B7280", marginTop: 2 }}>Min {usd(p.minDeposit)} · {p.apy}% APY</div>
+                <div className="text-muted text-[11px] mt-0.5">Min {usd(p.minDeposit)} · {p.apy}% APY</div>
               </div>
-              <span style={{
-                fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 999,
-                background: p.status === "live" ? "#E6F7EC" : "#FEE4E2",
-                color: p.status === "live" ? "#1a7f3b" : "#991B1B",
-              }}>
+              <span
+                className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                style={{
+                  background: p.status === "live" ? "#E6F7EC" : "#FEE4E2",
+                  color:      p.status === "live" ? "#1a7f3b"  : "#991B1B",
+                }}
+              >
                 {p.status.toUpperCase()}
               </span>
             </div>
           ))}
-        </div>
+        </Card>
 
         {/* Recent transactions */}
-        <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, padding: 20 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-            <h2 style={{ margin: 0, fontSize: 15 }}>Recent Transactions</h2>
-          </div>
+        <Card>
+          <SectionTitle title="Recent Transactions" />
           {recentTxs.map((t) => (
-            <div key={t.id} style={{ display: "grid", gridTemplateColumns: "24px 1fr auto", gap: 10, alignItems: "center", padding: "8px 0", borderBottom: "1px solid #E5E7EB", fontSize: 12 }}>
-              <div style={{ width: 24, height: 24, borderRadius: "50%", display: "grid", placeItems: "center", fontSize: 11, background: txTypeBg[t.type] ?? "#E6F7EC", color: txTypeColor[t.type] ?? "#1a7f3b" }}>
-                {txTypeIcon[t.type]}
-              </div>
-              <div>
-                <div style={{ fontWeight: 600 }}>{t.note ?? t.type}</div>
-                <div style={{ color: "#6B7280", fontSize: 11 }}>
-                  {new Date(t.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                  {" · "}{t.txHash.slice(0, 6)}…{t.txHash.slice(-2)}
-                </div>
-              </div>
-              <div style={{ fontWeight: 600, color: t.amountUsd < 0 ? "#EF4444" : t.type === "yield" ? "#15803d" : "#111827" }}>
-                {t.amountUsd >= 0 ? "+" : ""}{t.amountUsd.toFixed(2)}
-              </div>
-            </div>
+            <TxRow
+              key={t.id}
+              icon={TX_ICON[t.type] ?? "·"}
+              iconBg={TX_BG[t.type] ?? "#E6F7EC"}
+              iconColor={TX_COLOR[t.type] ?? "#1a7f3b"}
+              title={t.note ?? t.type}
+              date={formatDate(t.createdAt)}
+              txHash={t.txHash}
+              amount={`${t.amountUsd >= 0 ? "+" : ""}${t.amountUsd.toFixed(2)}`}
+              amountClass={t.amountUsd < 0 ? "text-neg font-semibold" : t.type === "yield" ? "text-pos font-semibold" : "font-semibold"}
+            />
           ))}
-        </div>
+        </Card>
       </div>
     </div>
   );

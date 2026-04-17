@@ -1,79 +1,62 @@
 import { db } from "@/lib/db/store";
+import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Users" };
 
+function usd(n: number) { return "$" + n.toLocaleString("en-US", { maximumFractionDigits: 0 }); }
+
 export default async function AdminUsers() {
-  const [users, positions, txs] = await Promise.all([
-    db.listUsers(),
-    db.listPositions(),
-    db.listTransactions({}),
-  ]);
+  const [users, positions] = await Promise.all([db.listUsers(), db.listPositions()]);
 
   return (
     <div>
-      <h1 style={{ margin: "0 0 6px", fontSize: 22 }}>Users</h1>
-      <p style={{ color: "#6B7280", margin: "0 0 24px", fontSize: 13 }}>
-        All registered investors.
-      </p>
+      <h1 className="m-0 mb-1 text-[22px] font-bold">Users</h1>
+      <p className="text-muted text-[13px] mt-0 mb-6">All registered investors.</p>
 
-      <div style={{ background: "#fff", border: "1px solid #E5E7EB", borderRadius: 14, overflow: "hidden" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div className="card overflow-hidden" style={{ padding: 0 }}>
+        <table className="data-table">
           <thead>
-            <tr style={{ background: "#F9FAFB" }}>
+            <tr>
               {["User", "Wallet", "Positions", "Total deposited", "Total value", "Yield paid", "Since"].map((h) => (
-                <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "#6B7280", fontWeight: 600, borderBottom: "1px solid #E5E7EB" }}>
-                  {h}
-                </th>
+                <th key={h}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {users.map((user) => {
-              const userPos = positions.filter((p) => p.userId === user.id);
-              const userTxs = txs.filter((t) =>
-                userPos.some((p) => p.id === t.positionId),
-              );
+              const userPos  = positions.filter((p) => p.userId === user.id);
               const deposited = userPos.reduce((a, p) => a + p.amountUsd, 0);
-              const value = userPos.reduce((a, p) => a + p.currentValueUsd, 0);
-              const yield_ = userPos.reduce((a, p) => a + p.yieldPaidUsd, 0);
+              const value     = userPos.reduce((a, p) => a + p.currentValueUsd, 0);
+              const yield_    = userPos.reduce((a, p) => a + p.yieldPaidUsd, 0);
+              const gain      = value - deposited;
 
               return (
-                <tr key={user.id} style={{ borderBottom: "1px solid #F3F4F6" }}>
-                  <td style={{ padding: "14px 16px", fontSize: 13 }}>
-                    <div style={{ fontWeight: 600 }}>{user.label ?? "—"}</div>
-                    <div style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "monospace" }}>{user.id}</div>
+                <tr key={user.id}>
+                  <td>
+                    <strong>{user.label ?? "—"}</strong>
+                    <div className="text-faint text-[11px] font-mono mt-0.5">{user.id}</div>
                   </td>
-                  <td style={{ padding: "14px 16px", fontSize: 12, fontFamily: "monospace", color: "#374151" }}>
+                  <td className="font-mono text-[12px]">
                     {user.walletAddress.slice(0, 6)}…{user.walletAddress.slice(-4)}
-                    <div style={{ fontSize: 10, color: "#9CA3AF", fontFamily: "inherit" }}>
-                      {user.walletAddress}
+                    <div className="text-faint text-[10px] font-sans mt-0.5">{user.walletAddress}</div>
+                  </td>
+                  <td className="font-semibold text-center">{userPos.length}</td>
+                  <td className="font-semibold">{usd(deposited)}</td>
+                  <td>
+                    <div className="font-semibold">{usd(value)}</div>
+                    <div className={`text-[11px] font-semibold ${gain >= 0 ? "text-pos" : "text-neg"}`}>
+                      {gain >= 0 ? "+" : ""}{usd(gain)}
                     </div>
                   </td>
-                  <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, textAlign: "center" }}>
-                    {userPos.length}
-                  </td>
-                  <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600 }}>
-                    ${deposited.toLocaleString()}
-                  </td>
-                  <td style={{ padding: "14px 16px", fontSize: 13 }}>
-                    <div style={{ fontWeight: 600 }}>${value.toLocaleString()}</div>
-                    <div style={{ fontSize: 11, color: value > deposited ? "#15803d" : "#EF4444", fontWeight: 600 }}>
-                      {value > deposited ? "+" : ""}${(value - deposited).toLocaleString()}
-                    </div>
-                  </td>
-                  <td style={{ padding: "14px 16px", fontSize: 13, color: "#15803d", fontWeight: 600 }}>
-                    +${yield_.toLocaleString()}
-                  </td>
-                  <td style={{ padding: "14px 16px", fontSize: 12, color: "#6B7280" }}>
-                    {new Date(user.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                  </td>
+                  <td className="text-pos font-semibold">+{usd(yield_)}</td>
+                  <td className="text-muted text-[12px]">{formatDate(user.createdAt)}</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
-        <div style={{ padding: "12px 16px", borderTop: "1px solid #E5E7EB", fontSize: 12, color: "#9CA3AF" }}>
+        <div className="px-4 py-3 border-t border-border text-faint text-[12px]">
           {users.length} user{users.length !== 1 ? "s" : ""}
         </div>
       </div>
