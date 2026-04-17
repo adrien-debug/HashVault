@@ -1,105 +1,254 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: var(--bg);
-  --color-foreground: var(--text);
-  
-  --color-mint-darkest: var(--mint-darkest);
-  --color-mint-darker: var(--mint-darker);
-  --color-mint-dark: var(--mint-dark);
-  --color-mint: var(--mint);
-  --color-mint-light: var(--mint-light);
-  --color-mint-lighter: var(--mint-lighter);
-  --color-mint-lightest: var(--mint-lightest);
-  
-  --color-gin-darkest: var(--gin-darkest);
-  --color-gin-darker: var(--gin-darker);
-  --color-gin-dark: var(--gin-dark);
-  --color-gin: var(--gin);
-  --color-gin-light: var(--gin-light);
-  --color-gin-lighter: var(--gin-lighter);
-  --color-gin-lightest: var(--gin-lightest);
-
-  --color-text-main: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-text-faint: var(--text-faint);
-
-  --color-hairline: var(--hairline);
-  --color-hairline-soft: var(--hairline-soft);
+  --color-bg: var(--bg);
   --color-card: var(--card);
+  --color-border: var(--border);
+  --color-text: var(--dark);
+  --color-muted: var(--muted);
+  --color-mint: var(--green);
+  --color-mint-soft: var(--green-soft);
+  --color-mint-strong: var(--green-strong);
+  --color-warn: var(--warn);
   --color-pos: var(--pos);
-  --color-neg: var(--neg);
+  --color-neg: var(--red);
 
-  --radius-card: var(--r-card);
-  --radius-pill: var(--r-pill);
-  --radius-input: var(--r-input);
-
-  --shadow-soft: var(--shadow-soft);
-  --shadow-mint: var(--shadow-mint);
+  --radius-card: 14px;
+  --radius-pill: 999px;
+  --radius-input: 10px;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 :root {
-  /* Hearst primitives */
-  --mint-darkest: #324b2b;
-  --mint-darker: #426439;
-  --mint-dark: #85c873;
-  --mint: #a7fb90;
-  --mint-light: #c1fcb1;
-  --mint-lighter: #edfee8;
-  --mint-lightest: #f6fef3;
-  
-  --gin-darkest: #454845;
-  --gin-darker: #5c605c;
-  --gin-dark: #b8c0b8;
-  --gin: #e6f1e7;
-  --gin-light: #edf5ee;
-  --gin-lighter: #fafcfa;
-  --gin-lightest: #fcfdfc;
-
-  /* Apple-grade refinements */
-  --text: #111111;
-  --text-muted: #666666;
-  --text-faint: #999999;
-  --hairline: rgba(0,0,0,0.04);
-  --hairline-soft: rgba(0,0,0,0.02);
-  --bg: #F5F5F7;
-  --card: #FFFFFF;
-  --pos: #1f7a3a;
-  --neg: #b42318;
-
-  --r-card: 20px;
-  --r-pill: 999px;
-  --r-input: 12px;
-
-  --shadow-soft: 0 2px 8px rgba(0,0,0,0.02), 0 8px 32px rgba(0,0,0,0.04);
-  --shadow-mint: 0 4px 12px rgba(50,75,43,0.08), 0 16px 40px rgba(50,75,43,0.12);
+  --green: #34c759;
+  --green-soft: #e6f7ec;
+  --green-strong: #1a7f3b;
+  --dark: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f7f8fa;
+  --card: #ffffff;
+  --red: #ef4444;
+  --warn: #f59e0b;
+  --pos: #15803d;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html,
 body {
+  margin: 0;
+  padding: 0;
   background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans), "-apple-system", BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: var(--dark);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Arial, sans-serif;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "ss01", "ss02", "cv11", "tnum";
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 ::selection {
-  background: var(--mint);
-  color: var(--text);
+  background: var(--green);
+  color: #fff;
 }
 
-/* Animations that we can use globally */
+/* ----- Shared utilities used across pages ----- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.kpi {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.kpi.sm {
+  font-size: 20px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--green-soft);
+  color: var(--green-strong);
+  border: 1px solid #cfead8;
+}
+
+.dot-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--green);
+  color: #fff;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s, opacity 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--dark);
+  border: 1px solid var(--border);
+}
+
+.btn.full {
+  width: 100%;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.pos {
+  color: var(--pos);
+}
+
+.neg {
+  color: var(--red);
+}
+
+.progress {
+  height: 8px;
+  background: #f1f3f5;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+}
+
+.h-uppercase {
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.amt-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.amt-input input {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 700;
+  flex: 1;
+  outline: none;
+  color: var(--dark);
+  -moz-appearance: textfield;
+}
+
+.amt-input input::-webkit-outer-spin-button,
+.amt-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.amt-input.valid {
+  border-color: var(--green);
+  background: #f4fcf6;
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.12);
+}
+
+.amt-input.invalid {
+  border-color: #f5c1c1;
+  background: #fef7f7;
+}
+
+.vault-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.vault-row:hover {
+  background: #f7fbf8;
+}
+
+.vault-highlight {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+  animation: vaultPulse 1.6s ease-out;
+}
+
+@keyframes vaultPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(52, 199, 89, 0);
+  }
+}
+
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(2px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .anim-fade-up {
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

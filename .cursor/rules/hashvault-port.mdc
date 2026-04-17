@@ -1,0 +1,10 @@
+---
+description: Port et origine HashVault — règle stricte
+alwaysApply: true
+---
+
+# HashVault — réseau
+
+- **Port unique** : l’application Next.js se lance **uniquement** sur le port **8000** (`npm run dev` / `npm start` déjà fixés dans `package.json`).
+- **Origine** : en dev, l’URL attendue est **`http://127.0.0.1:8000`** (serveur lié à `127.0.0.1` uniquement, pas d’autre hôte ni autre port).
+- **Interdiction** : ne pas proposer ni documenter `localhost:3000`, `:3001`, `0.0.0.0` ou un autre port pour ce projet sans validation explicite du propriétaire.

@@ -40,3 +40,21 @@ export function formatCountdown(targetSeconds: number) {
   const now = Math.floor(Date.now() / 1000);
   return formatDuration(Math.max(0, targetSeconds - now));
 }
+
+export function formatDate(iso: string, opts?: Intl.DateTimeFormatOptions) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    ...opts,
+  });
+}
+
+export function formatShortHash(hash: string) {
+  if (!hash) return "";
+  return `${hash.slice(0, 4)}…${hash.slice(-2)}`;
+}
+

@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { headers } from "next/headers";
-import { Web3Provider } from "@/providers/Web3Provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,23 +13,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HashVault — Dashboard",
-  description: "HashVault — institutional-grade USDC vaults",
+  title: {
+    default: "HashVault Connect",
+    template: "%s · HashVault",
+  },
+  description:
+    "HashVault Connect — institutional yield vaults powered by Bitcoin mining. Daily distributions, 3-year lock, capital recovery safeguard.",
+  applicationName: "HashVault",
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const headersObj = await headers();
-  const cookies = headersObj.get("cookie");
+export const viewport = {
+  themeColor: "#34C759",
+  colorScheme: "light" as const,
+  width: "device-width",
+  initialScale: 1,
+};
 
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full font-sans">
-        <Web3Provider cookies={cookies}>{children}</Web3Provider>
-      </body>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+    >
+      <body>{children}</body>
     </html>
   );
 }

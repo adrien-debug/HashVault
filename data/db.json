@@ -1,0 +1,463 @@
+{
+  "products": [
+    {
+      "id": "prod_prime",
+      "slug": "prime",
+      "name": "HashVault Prime",
+      "status": "live",
+      "apy": 12,
+      "minDeposit": 500000,
+      "lockMonths": 36,
+      "cumulativeTargetPct": 36,
+      "risk": "Moderate",
+      "feesMgmtPct": 1.5,
+      "feesPerfPct": 15,
+      "network": "Base (Ethereum L2)",
+      "depositToken": "USDC",
+      "description": "RWA Mining captures real-economy cashflow, USDC Yield anchors a stable income floor, and BTC Hedged adds delta-neutral upside. The tri-pillar mix smooths volatility across market cycles and distributes yield daily. The vault closes and principal unlocks once the 36% cumulative target is reached — or at 3-year maturity.",
+      "lead": "A three-pocket income engine built for consistency.",
+      "pockets": [
+        {
+          "label": "RWA Mining",
+          "pct": 40,
+          "color": "#34C759"
+        },
+        {
+          "label": "USDC Yield",
+          "pct": 30,
+          "color": "#111827"
+        },
+        {
+          "label": "BTC Hedged",
+          "pct": 30,
+          "color": "#9CA3AF"
+        }
+      ],
+      "scenarios": [
+        {
+          "type": "bull",
+          "title": "Accelerate growth",
+          "description": "Rising BTC + mining cashflow. Mining weight ↑, hedging lighter. Yield compounds faster.",
+          "mix": [
+            {
+              "color": "#34C759",
+              "weight": 55
+            },
+            {
+              "color": "#111827",
+              "weight": 25
+            },
+            {
+              "color": "#9CA3AF",
+              "weight": 20
+            }
+          ]
+        },
+        {
+          "type": "flat",
+          "title": "Baseline mix",
+          "description": "Stable mining production + diversified USDC yield keep generating returns at the default weights.",
+          "mix": [
+            {
+              "color": "#34C759",
+              "weight": 40
+            },
+            {
+              "color": "#111827",
+              "weight": 30
+            },
+            {
+              "color": "#9CA3AF",
+              "weight": 30
+            }
+          ]
+        },
+        {
+          "type": "bear",
+          "title": "Protect capital",
+          "description": "Distribution shifts toward USDC Yield and BTC Hedged. Volatility thresholds tighten, defensive allocation grows.",
+          "mix": [
+            {
+              "color": "#34C759",
+              "weight": 25
+            },
+            {
+              "color": "#111827",
+              "weight": 45
+            },
+            {
+              "color": "#9CA3AF",
+              "weight": 30
+            }
+          ]
+        }
+      ],
+      "activeRegime": "flat",
+      "createdAt": "2024-09-01T00:00:00.000Z",
+      "updatedAt": "2024-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "prod_growth",
+      "slug": "growth",
+      "name": "HashVault Growth",
+      "status": "live",
+      "apy": 15,
+      "minDeposit": 250000,
+      "lockMonths": 36,
+      "cumulativeTargetPct": 45,
+      "risk": "Growth",
+      "feesMgmtPct": 2,
+      "feesPerfPct": 15,
+      "network": "Base (Ethereum L2)",
+      "depositToken": "USDC",
+      "description": "BTC Spot drives direct cycle-level appreciation while Collateral Mining generates steady cashflow that supports returns during drawdowns. Allocation re-weights dynamically with the market regime, yield is distributed daily. The vault closes and principal unlocks once the 45% cumulative target is reached — or at 3-year maturity.",
+      "lead": "Bitcoin upside with a mining-backed cushion.",
+      "pockets": [
+        {
+          "label": "BTC Spot",
+          "pct": 70,
+          "color": "#F59E0B"
+        },
+        {
+          "label": "Collateral Mining",
+          "pct": 30,
+          "color": "#111827"
+        }
+      ],
+      "scenarios": [
+        {
+          "type": "bull",
+          "title": "Accelerate growth",
+          "description": "Rising BTC + mining cashflow accelerate value. Full BTC exposure maintained.",
+          "mix": [
+            {
+              "color": "#F59E0B",
+              "weight": 80
+            },
+            {
+              "color": "#111827",
+              "weight": 20
+            }
+          ]
+        },
+        {
+          "type": "flat",
+          "title": "Baseline mix",
+          "description": "Stable mining keeps generating yield while BTC trades flat. Default weights.",
+          "mix": [
+            {
+              "color": "#F59E0B",
+              "weight": 70
+            },
+            {
+              "color": "#111827",
+              "weight": 30
+            }
+          ]
+        },
+        {
+          "type": "bear",
+          "title": "Protect capital",
+          "description": "Mining weight rises to cushion BTC drawdowns. Distribution prioritises preservation.",
+          "mix": [
+            {
+              "color": "#F59E0B",
+              "weight": 55
+            },
+            {
+              "color": "#111827",
+              "weight": 45
+            }
+          ]
+        }
+      ],
+      "activeRegime": "flat",
+      "createdAt": "2024-09-01T00:00:00.000Z",
+      "updatedAt": "2024-09-01T00:00:00.000Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "user_demo",
+      "walletAddress": "0x7Ab000000000000000000000000000000000a3F2",
+      "label": "Demo User",
+      "createdAt": "2024-10-01T00:00:00.000Z"
+    }
+  ],
+  "positions": [
+    {
+      "id": "pos_prime_1",
+      "userId": "user_demo",
+      "productSlug": "prime",
+      "index": 1,
+      "amountUsd": 500000,
+      "currentValueUsd": 542100,
+      "yieldPaidUsd": 28120,
+      "startedAt": "2024-10-12T00:00:00.000Z",
+      "maturesAt": "2027-10-15T00:00:00.000Z",
+      "cumulativeProgressPct": 22
+    },
+    {
+      "id": "pos_prime_2",
+      "userId": "user_demo",
+      "productSlug": "prime",
+      "index": 2,
+      "amountUsd": 200000,
+      "currentValueUsd": 216000,
+      "yieldPaidUsd": 16000,
+      "startedAt": "2025-08-03T00:00:00.000Z",
+      "maturesAt": "2028-08-03T00:00:00.000Z",
+      "cumulativeProgressPct": 8
+    },
+    {
+      "id": "pos_growth_1",
+      "userId": "user_demo",
+      "productSlug": "growth",
+      "index": 1,
+      "amountUsd": 250000,
+      "currentValueUsd": 260240,
+      "yieldPaidUsd": 14060,
+      "startedAt": "2025-04-04T00:00:00.000Z",
+      "maturesAt": "2028-04-04T00:00:00.000Z",
+      "cumulativeProgressPct": 11
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_p1_1",
+      "positionId": "pos_prime_1",
+      "type": "yield",
+      "amountUsd": 164.38,
+      "txHash": "0x8a000000000000000000000000000000000000f1",
+      "createdAt": "2026-04-13T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p1_2",
+      "positionId": "pos_prime_1",
+      "type": "yield",
+      "amountUsd": 164.38,
+      "txHash": "0x1c0000000000000000000000000000000000b400",
+      "createdAt": "2026-04-12T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p1_3",
+      "positionId": "pos_prime_1",
+      "type": "yield",
+      "amountUsd": 164.38,
+      "txHash": "0x77000000000000000000000000000000000009e0",
+      "createdAt": "2026-04-11T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p1_4",
+      "positionId": "pos_prime_1",
+      "type": "yield",
+      "amountUsd": 164.38,
+      "txHash": "0x4200000000000000000000000000000000000007",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p1_5",
+      "positionId": "pos_prime_1",
+      "type": "yield",
+      "amountUsd": 164.38,
+      "txHash": "0x3b00000000000000000000000000000000000d00",
+      "createdAt": "2026-04-09T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p1_6",
+      "positionId": "pos_prime_1",
+      "type": "yield",
+      "amountUsd": 164.38,
+      "txHash": "0x9e00000000000000000000000000000000000051",
+      "createdAt": "2026-04-08T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p1_7",
+      "positionId": "pos_prime_1",
+      "type": "fee",
+      "amountUsd": -72.4,
+      "txHash": "0x180000000000000000000000000000000000a400",
+      "createdAt": "2026-03-31T00:00:00.000Z",
+      "frequency": "monthly",
+      "note": "Performance fee"
+    },
+    {
+      "id": "tx_p1_8",
+      "positionId": "pos_prime_1",
+      "type": "deposit",
+      "amountUsd": 500000,
+      "txHash": "0x2f000000000000000000000000000000000000ee",
+      "createdAt": "2024-10-15T00:00:00.000Z",
+      "frequency": "one-off",
+      "note": "Initial deposit"
+    },
+    {
+      "id": "tx_p2_1",
+      "positionId": "pos_prime_2",
+      "type": "yield",
+      "amountUsd": 65.75,
+      "txHash": "0xb700000000000000000000000000000000000042",
+      "createdAt": "2026-04-13T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p2_2",
+      "positionId": "pos_prime_2",
+      "type": "yield",
+      "amountUsd": 65.75,
+      "txHash": "0x4d000000000000000000000000000000000000a9",
+      "createdAt": "2026-04-12T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p2_3",
+      "positionId": "pos_prime_2",
+      "type": "yield",
+      "amountUsd": 65.75,
+      "txHash": "0x29000000000000000000000000000000000000c1",
+      "createdAt": "2026-04-11T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_p2_4",
+      "positionId": "pos_prime_2",
+      "type": "fee",
+      "amountUsd": -28.96,
+      "txHash": "0x5f000000000000000000000000000000000000b8",
+      "createdAt": "2026-03-31T00:00:00.000Z",
+      "frequency": "monthly",
+      "note": "Performance fee"
+    },
+    {
+      "id": "tx_p2_5",
+      "positionId": "pos_prime_2",
+      "type": "deposit",
+      "amountUsd": 200000,
+      "txHash": "0x91000000000000000000000000000000000000de",
+      "createdAt": "2025-08-03T00:00:00.000Z",
+      "frequency": "one-off",
+      "note": "Initial deposit"
+    },
+    {
+      "id": "tx_g1_1",
+      "positionId": "pos_growth_1",
+      "type": "yield",
+      "amountUsd": 102.74,
+      "txHash": "0x4e000000000000000000000000000000000000c2",
+      "createdAt": "2026-04-13T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_g1_2",
+      "positionId": "pos_growth_1",
+      "type": "yield",
+      "amountUsd": 102.74,
+      "txHash": "0x9d000000000000000000000000000000000000aa",
+      "createdAt": "2026-04-12T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_g1_3",
+      "positionId": "pos_growth_1",
+      "type": "yield",
+      "amountUsd": 102.74,
+      "txHash": "0x200000000000000000000000000000000000008f",
+      "createdAt": "2026-04-11T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_g1_4",
+      "positionId": "pos_growth_1",
+      "type": "yield",
+      "amountUsd": 102.74,
+      "txHash": "0x6c00000000000000000000000000000000000011",
+      "createdAt": "2026-04-10T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_g1_5",
+      "positionId": "pos_growth_1",
+      "type": "yield",
+      "amountUsd": 102.74,
+      "txHash": "0x55000000000000000000000000000000000000e3",
+      "createdAt": "2026-04-09T00:00:00.000Z",
+      "frequency": "daily"
+    },
+    {
+      "id": "tx_g1_6",
+      "positionId": "pos_growth_1",
+      "type": "fee",
+      "amountUsd": -45.1,
+      "txHash": "0x82000000000000000000000000000000000000b7",
+      "createdAt": "2026-03-31T00:00:00.000Z",
+      "frequency": "monthly",
+      "note": "Performance fee"
+    },
+    {
+      "id": "tx_g1_7",
+      "positionId": "pos_growth_1",
+      "type": "deposit",
+      "amountUsd": 250000,
+      "txHash": "0x7b00000000000000000000000000000000000019",
+      "createdAt": "2025-04-04T00:00:00.000Z",
+      "frequency": "one-off",
+      "note": "Initial deposit"
+    }
+  ],
+  "portfolioHistory": [
+    {
+      "month": "May",
+      "valueUsd": 700000
+    },
+    {
+      "month": "Jun",
+      "valueUsd": 705000
+    },
+    {
+      "month": "Jul",
+      "valueUsd": 712000
+    },
+    {
+      "month": "Aug",
+      "valueUsd": 718000
+    },
+    {
+      "month": "Sep",
+      "valueUsd": 722000
+    },
+    {
+      "month": "Oct",
+      "valueUsd": 728000
+    },
+    {
+      "month": "Nov",
+      "valueUsd": 735000
+    },
+    {
+      "month": "Dec",
+      "valueUsd": 740000
+    },
+    {
+      "month": "Jan",
+      "valueUsd": 744000
+    },
+    {
+      "month": "Feb",
+      "valueUsd": 748000
+    },
+    {
+      "month": "Mar",
+      "valueUsd": 750500
+    },
+    {
+      "month": "Apr",
+      "valueUsd": 752340
+    }
+  ]
+}

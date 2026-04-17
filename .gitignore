@@ -43,3 +43,6 @@ next-env.d.ts
 
 # external reference repos (read-only, for product understanding only)
 /external/
+
+# dev logs
+terminal-dev.log
