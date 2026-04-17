@@ -8,7 +8,7 @@ export default function ClientLayout({
   return (
     <div className="shell">
       <Topbar />
-      {children}
+      <div className="anim-fade-up">{children}</div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db/store";
-import { ProgressBar } from "@/components/ui";
+import { PageHeader, ProgressBar } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -24,10 +24,9 @@ export default async function AdminPositions() {
 
   return (
     <div>
-      <h1 className="m-0 mb-1 text-[22px] font-bold">Positions</h1>
-      <p className="text-muted text-[13px] mt-0 mb-6">All investor positions across all products.</p>
+      <PageHeader title="Positions" subtitle="All investor positions across all products." />
 
-      <div className="card overflow-hidden" style={{ padding: 0 }}>
+      <div className="card overflow-hidden !p-0">
         <table className="data-table">
           <thead>
             <tr>

@@ -2,7 +2,7 @@ import { db } from "@/lib/db/store";
 import { DashboardClient } from "./DashboardClient";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Dashboard · HashVault" };
+export const metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
   const [positions, history, products] = await Promise.all([

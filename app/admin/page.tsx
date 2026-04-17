@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db/store";
-import { Card, SectionTitle, TxRow } from "@/components/ui";
+import { Card, PageHeader, Pill, SectionTitle, StatCard, TxRow } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -39,31 +39,33 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="m-0 mb-1 text-[22px] font-bold">Admin Dashboard</h1>
-      <p className="text-muted text-[13px] mt-0 mb-6">Platform overview · all data from database.</p>
+      <PageHeader
+        title="Admin overview"
+        subtitle="Platform-wide metrics · all data live from database."
+        right={<Pill>LIVE</Pill>}
+      />
 
       {/* KPI grid */}
-      <div className="grid-4" style={{ marginBottom: 24 }}>
+      <div className="grid-4 stagger" style={{ marginBottom: 22 }}>
         {kpis.map((k) => (
-          <div
+          <StatCard
             key={k.label}
-            className="card"
-            style={{ borderTop: `3px solid ${k.accent}`, padding: 20 }}
-          >
-            <div className="label-upper mb-1.5">{k.label}</div>
-            <div className="text-[26px] font-bold tracking-tight">{k.value}</div>
-            <div className="text-muted text-[12px] mt-0.5">{k.sub}</div>
-          </div>
+            label={k.label}
+            value={k.value}
+            sub={k.sub}
+            accent={k.accent}
+            size="lg"
+          />
         ))}
       </div>
 
       {/* Stat line */}
-      <div className="grid-4" style={{ marginBottom: 24 }}>
+      <div className="grid-4 stagger" style={{ marginBottom: 22 }}>
         {stats.map((s) => (
-          <div key={s.label} className="card flex justify-between items-center" style={{ padding: "14px 18px" }}>
+          <Card key={s.label} variant="flat" className="!p-4 flex justify-between items-center">
             <span className="text-muted text-[13px]">{s.label}</span>
-            <strong className="text-[18px]">{s.value}</strong>
-          </div>
+            <strong className="text-[18px] tracking-tight">{s.value}</strong>
+          </Card>
         ))}
       </div>
 

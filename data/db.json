@@ -220,6 +220,18 @@
       "startedAt": "2025-04-04T00:00:00.000Z",
       "maturesAt": "2028-04-04T00:00:00.000Z",
       "cumulativeProgressPct": 11
+    },
+    {
+      "id": "pos_mo2wvl7s_3o0g4m",
+      "userId": "user_demo",
+      "productSlug": "prime",
+      "index": 3,
+      "amountUsd": 1000000,
+      "currentValueUsd": 1000000,
+      "yieldPaidUsd": 0,
+      "startedAt": "2026-04-17T12:55:40.072Z",
+      "maturesAt": "2029-04-17T12:55:40.072Z",
+      "cumulativeProgressPct": 0
     }
   ],
   "transactions": [
@@ -406,6 +418,16 @@
       "amountUsd": 250000,
       "txHash": "0x7b00000000000000000000000000000000000019",
       "createdAt": "2025-04-04T00:00:00.000Z",
+      "frequency": "one-off",
+      "note": "Initial deposit"
+    },
+    {
+      "id": "tx_mo2wvl7s_h31dod",
+      "positionId": "pos_mo2wvl7s_3o0g4m",
+      "type": "deposit",
+      "amountUsd": 1000000,
+      "txHash": "0x1afaa6f32864a000000000000000000000000000",
+      "createdAt": "2026-04-17T12:55:40.072Z",
       "frequency": "one-off",
       "note": "Initial deposit"
     }

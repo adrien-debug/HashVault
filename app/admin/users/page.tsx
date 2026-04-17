@@ -1,4 +1,5 @@
 import { db } from "@/lib/db/store";
+import { PageHeader } from "@/components/ui";
 import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -11,10 +12,9 @@ export default async function AdminUsers() {
 
   return (
     <div>
-      <h1 className="m-0 mb-1 text-[22px] font-bold">Users</h1>
-      <p className="text-muted text-[13px] mt-0 mb-6">All registered investors.</p>
+      <PageHeader title="Users" subtitle="All registered investors." />
 
-      <div className="card overflow-hidden" style={{ padding: 0 }}>
+      <div className="card overflow-hidden !p-0">
         <table className="data-table">
           <thead>
             <tr>

@@ -1,31 +1,41 @@
 # HashVault
 
 Application [Next.js 16](https://nextjs.org) (App Router, React 19, Tailwind v4, TypeScript).
-Frontend dans `app/`, mini backend via routes API (`app/api/`), couche Web3 dans
-`lib/web3/`, `lib/abi/`, `hooks/` et `providers/`.
+Dashboard fintech « institutional yield vaults » avec espace client + admin.
+Stockage en mémoire (mock DB) — pas de blockchain dans cette branche.
 
 ## Pages
 
+### Espace client (`app/(client)/`)
+
 | Route | Rôle | Données |
 |---|---|---|
-| `/` | Landing publique : hero + section produits + section "Why HashVault" + CTA "Launch App" + footer | Statique |
-| `/dashboard` | Dashboard demo (KPI, portfolio chart, allocation, liste vaults) | **Mocks** — preview design |
-| `/platform` | Liste des deux vaults (Prime + Growth) avec carte par vault | **On-chain** via `useVaultInfo` (fallback APR statique si vault non déployé) |
-| `/vault/[id]` | Page d'un vault : métriques, formulaire dépôt (Approve → Deposit), position user (Claim / Compound / Withdraw) | **On-chain** via `useVaultInfo`, `useUserVaultInfo`, `useUsdcAllowance/Approve`, `useDeposit`, `useClaimRewards`, `useRedepositRewards`, `useWithdraw` |
-| `/api/health` | Healthcheck JSON | — |
+| `/` | Dashboard portfolio : KPIs hero, courbe valeur, donut allocation, table vaults | Mock DB |
+| `/vaults` | Détail position par position : KPIs, progress, chart yield, scenarios, transactions | Mock DB |
+| `/invest` | Stepper 4 étapes : sélection vault → produit → dépôt simulé → confirmation | Mock DB + `POST /api/positions` |
 
-Toutes les pages applicatives partagent `app/(app)/layout.tsx` (sidebar + bannière "wrong network" si chainId non supportée).
+### Espace admin (`app/admin/`)
+
+| Route | Rôle |
+|---|---|
+| `/admin` | Vue d'ensemble : TVL, dépôts, yield, fees, produits, transactions récentes |
+| `/admin/products` | Liste produits + édition (`/admin/products/[slug]`) |
+| `/admin/positions` | Toutes positions (TVL, gains, progress) |
+| `/admin/users` | Liste investisseurs |
+
+### API
+
+- `GET  /api/health` — healthcheck
+- `POST /api/positions` — création de position simulée
 
 ## Démarrage
 
 ```bash
 npm install
-cp .env.example .env.local   # puis remplir au minimum NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
 npm run dev
 ```
 
-Ouvrir **`http://127.0.0.1:8000`** — le serveur de dev est fixé sur le port **8000**
-et sur l’hôte **127.0.0.1** uniquement (voir `package.json`).
+Ouvrir **`http://127.0.0.1:8000`** — le serveur de dev est fixé sur le port **8000** et l'hôte **127.0.0.1** uniquement (voir `package.json`).
 
 Production locale après build :
 
@@ -34,53 +44,91 @@ npm run build
 npm start
 ```
 
-Même port et même hôte : **8000** / **127.0.0.1**.
+## Architecture
 
-## Architecture Web3
+```
+app/
+  (client)/          → espace investisseur (Topbar partagée)
+    page.tsx + DashboardClient.tsx
+    vaults/         → My Vaults
+    invest/         → flow d'investissement (4 étapes)
+  admin/            → console admin (sidebar sombre)
+    page.tsx
+    products/, positions/, users/
+  api/              → routes API (health, positions)
+  layout.tsx        → root (Geist Sans + Mono, viewport, metadata)
+  globals.css       → design system v2 (tokens, surfaces, motion)
 
-| Dossier | Rôle |
+components/
+  Topbar.tsx          → glass sticky, tabs, ⌘K trigger, ThemeToggle, burger mobile
+  MobileDrawer.tsx    → drawer navigation mobile (slide-in)
+  ThemeToggle.tsx     → bouton soleil/lune (useTheme)
+  Sparkline.tsx       → mini SVG sparkline (canvas-like, gradient fill)
+  ViewTransitionLink  → <a> avec View Transitions API natif
+  ui.tsx              → Card, StatCard (+sparkline), Kpi, Pill, Badge, ProgressBar,
+                         StratBar, LegendItem, SumRow, TxRow, EmptyState,
+                         Skeleton, Divider, PageHeader, SectionTitle, Label
+  charts/             → PortfolioLineChart · AllocationDonut · YieldBarChart
+                         (chart.js partagé via ChartRegistry)
+
+providers/
+  ThemeProvider.tsx         → context light/dark, localStorage, NO_FLASH_SCRIPT
+  ToastProvider.tsx         → file de toasts (success/error/info, auto-dismiss)
+  CommandPaletteProvider    → ⌘K palette avec fuzzy search, navigation, actions
+
+hooks/
+  useNowMs.ts       → horloge partagée (useSyncExternalStore, SSR-safe)
+
+lib/
+  db/store.ts       → adapter mock DB (in-memory, lit/écrit `lib/db/seed.ts`)
+  db/types.ts       → Product · User · Position · Transaction · PortfolioPoint
+  format.ts         → formatUsd, formatNumber, shortenAddress, formatDate, …
+```
+
+## Design system v2
+
+Tokens dans `app/globals.css` :
+
+- **Palette** : neutrals Apple (`#0F1115` → `#FBFBFD`) + scale mint Hearst (50→900)
+- **Radii** : `--radius-card` (18px), `--radius-pill`, `--radius-input` (12px)
+- **Shadows** : `subtle`, `soft`, `lift`, `glow`, `mint`, `ring`, `focus`
+- **Motion** : `--ease-out` (Apple cubic-bezier), `--ease-spring`, durées `fast/base/slow`
+- **Typography** : Geist Sans + Mono, scale `display / h1 / h2 / h3 / kpi-xl…sm`, `font-feature-settings: cv11 ss01 ss03 tnum`
+- **Background** : gradient mint très subtil en arrière-plan (`body::before`)
+
+Composants réutilisables clés (`components/ui.tsx`) :
+
+- `<StatCard>` — KPI carte avec accent latéral, delta optionnel, sparkline intégrée
+- `<PageHeader>` — h1 + subtitle + actions à droite
+- `<EmptyState>` — icône + titre + description + CTA
+- `<Skeleton>` — pulse loading
+- `<Sparkline>` — mini courbe SVG avec gradient
+
+**Dark mode** : tokens `:root[data-theme="dark"]` dans `globals.css`, toggle persisté en `localStorage`, anti-flash inline script.
+
+**⌘K Command Palette** : fuzzy search, navigation + actions (dark mode toggle), keyboard nav (↑↓ + Enter + Esc).
+
+**Toasts** : provider avec file FIFO, 3 variants (success/error/info), auto-dismiss 4s, animation entrée/sortie.
+
+**View Transitions** : `::view-transition-old/new` CSS + `ViewTransitionLink` component pour transitions cinématiques.
+
+**Mobile** : burger menu → `MobileDrawer` slide-in, topbar responsive (`hidden sm:`), table scroll wrapper.
+
+Animations : `.anim-fade-up`, `.anim-fade-in`, `.stagger > *` (délai cascade).
+Respecte `prefers-reduced-motion`.
+
+## Scripts
+
+| Commande | Description |
 |---|---|
-| `lib/web3/env.ts` | Lecture des variables `NEXT_PUBLIC_*`, fallbacks, validation |
-| `lib/web3/contracts.ts` | Adresses USDC / VaultFactory / vaults Prime & Growth par chaîne |
-| `lib/web3/wagmi.ts` | Adapter `@reown/appkit-adapter-wagmi`, networks supportées |
-| `lib/abi/EpochVault.json` | ABI du contrat `EpochVault.sol` (vault USDC, epochs 30j) |
-| `lib/abi/VaultFactory.json` | ABI du contrat `VaultFactory.sol` |
-| `lib/abi/erc20.ts` | ABI ERC-20 minimal (allowance / approve / balance) |
-| `providers/Web3Provider.tsx` | `WagmiProvider` + `QueryClientProvider` + AppKit init |
-| `hooks/useVault.ts` | `useVaultInfo`, `useUserVaultInfo`, `useDeposit`, `useWithdraw`, `useClaimRewards`, `useRedepositRewards`, `useUsdcAllowance`, `useUsdcApprove`, `useExpectedRewards`, `useEmergencyWithdraw` |
-| `hooks/useFactory.ts` | `useDeployedVaults` |
-| `hooks/useNowSeconds.ts` | Horloge partagée (via `useSyncExternalStore`) pour countdowns / progress |
-| `lib/format.ts` | Helpers d'affichage (`formatUsd`, `formatNumber`, `formatDuration`, `shortenAddress`) |
-| `components/ConnectWalletButton.tsx` | CTA wallet (ouvre AppKit) |
-| `components/shared/NetworkBanner.tsx` | Bandeau d'avertissement "wrong network" |
-| `components/landing/*` | `Hero`, `Highlights`, `Footer`, `LandingNav` |
-| `components/platform/VaultCard.tsx` | Carte vault avec APR / total deposits / CTA |
-| `components/vault/VaultMetrics.tsx` | Métriques on-chain (APR, total, epoch courant, countdown) |
-| `components/vault/DepositCard.tsx` | Flow Approve → Deposit (input USDC, balance, est. reward) |
-| `components/vault/UserPositionCard.tsx` | Position user + Claim / Compound / Withdraw |
+| `npm run dev` | Dev server Turbopack sur `127.0.0.1:8000` |
+| `npm run build` | Build production |
+| `npm start` | Serveur production (port `$PORT` ou 8000) |
+| `npm run lint` | ESLint |
 
-### Networks supportées
+## Notes
 
-- **Base mainnet** (chainId `8453`) — cible production
-- **Base Sepolia** (chainId `84532`) — testnet par défaut
-- **Sepolia** (chainId `11155111`) — fallback dev (déploiement legacy)
-
-### Variables d'environnement
-
-Voir `.env.example`. Au minimum :
-
-- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` — sans cette clé l'AppKit n'est pas initialisé.
-- `NEXT_PUBLIC_BASE_VAULT_PRIME_ADDRESS` / `NEXT_PUBLIC_BASE_VAULT_GROWTH_ADDRESS` — à
-  renseigner après déploiement des vaults sur Base. Les adresses USDC sont
-  pré-remplies (Circle USDC officiel).
-
-## API
-
-- `GET /api/health` → `{ "ok": true, "app": "HashVault" }`
-
-## Référence
-
-Le code Solidity et le front legacy se trouvent dans `external/` (cloné depuis les
-repos `SingularityDAO-dev/Meeneo-dapp` et `SingularityDAO-dev/meeneo-epoch-vault`).
-Ces dossiers sont en lecture seule — ils ne servent qu'à comprendre le contrat et
-sont ignorés par git.
+- Pas de blockchain dans cette branche : la mock DB simule positions et transactions.
+- Le wallet affiché en topbar est un placeholder (`0x7Ab…a3F2`).
+- Pour brancher du Web3 réel, voir l'historique git : une version précédente intégrait
+  wagmi v2 + AppKit + ABI EpochVault/VaultFactory.

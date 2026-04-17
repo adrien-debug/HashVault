@@ -32,5 +32,12 @@ export function ensureChartsRegistered() {
     PointElement,
     Tooltip,
   );
+
+  Chart.defaults.font.family =
+    'var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = "#6E6E73";
+  Chart.defaults.borderColor = "#ECECEF";
+
   registered = true;
 }

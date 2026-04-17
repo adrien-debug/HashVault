@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider, NO_FLASH_SCRIPT } from "@/providers/ThemeProvider";
+import { ToastProvider } from "@/providers/ToastProvider";
+import { CommandPaletteProvider } from "@/providers/CommandPaletteProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,8 +26,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: "#34C759",
-  colorScheme: "light" as const,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FBFBFD" },
+    { media: "(prefers-color-scheme: dark)",  color: "#0A0B0E" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -36,8 +41,20 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
     >
-      <body>{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
+      </head>
+      <body>
+        <ThemeProvider>
+          <ToastProvider>
+            <CommandPaletteProvider>
+              {children}
+            </CommandPaletteProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

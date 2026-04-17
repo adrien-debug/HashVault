@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { db } from "@/lib/db/store";
-import { Card, LegendItem, StratBar } from "@/components/ui";
+import { Card, LegendItem, PageHeader, StratBar } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Products" };
@@ -12,10 +12,9 @@ export default async function AdminProducts() {
 
   return (
     <div>
-      <h1 className="m-0 mb-1 text-[22px] font-bold">Products</h1>
-      <p className="text-muted text-[13px] mt-0 mb-6">Manage vault products. Clients see these on the Invest page (read-only).</p>
+      <PageHeader title="Products" subtitle="Manage vault products. Clients see these on the Invest page (read-only)." />
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 stagger">
         {products.map((p) => {
           const posCount = positions.filter((pos) => pos.productSlug === p.slug).length;
           const tvl      = positions.filter((pos) => pos.productSlug === p.slug).reduce((a, pos) => a + pos.currentValueUsd, 0);
@@ -51,9 +50,9 @@ export default async function AdminProducts() {
                   { k: "Positions", v: posCount },
                   { k: "TVL",       v: "$" + Math.round(tvl / 1000) + "k" },
                 ].map(({ k, v }) => (
-                  <div key={k} className="text-center bg-[#F7F8FA] rounded-[8px] py-2.5 px-1.5">
+                  <div key={k} className="text-center rounded-[10px] py-3 px-1.5" style={{ background: "var(--color-bg-soft)", boxShadow: "inset 0 0 0 1px var(--color-border-soft)" }}>
                     <div className="label-upper mb-1">{k}</div>
-                    <div className="text-[15px] font-bold">{v}</div>
+                    <div className="text-[15px] font-bold tracking-tight">{v}</div>
                   </div>
                 ))}
               </div>

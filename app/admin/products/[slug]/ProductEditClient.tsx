@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Product, ProductStatus, ScenarioType } from "@/lib/db/types";
 
@@ -103,7 +104,7 @@ export function ProductEditClient({ product }: Props) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
-          <a href="/admin/products" style={{ fontSize: 12, color: "#6B7280", display: "flex", alignItems: "center", gap: 4, marginBottom: 8 }}>← Products</a>
+          <Link href="/admin/products" style={{ fontSize: 12, color: "#6B7280", display: "flex", alignItems: "center", gap: 4, marginBottom: 8 }}>← Products</Link>
           <h1 style={{ margin: 0, fontSize: 22 }}>{product.name}</h1>
           <p style={{ color: "#6B7280", margin: "4px 0 0", fontSize: 13 }}>Edit product configuration. Changes affect client visibility immediately.</p>
         </div>

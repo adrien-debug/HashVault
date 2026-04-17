@@ -8,7 +8,7 @@ type Slice = { label: string; value: number; color: string };
 
 type Props = { slices: Slice[]; height?: number };
 
-export function AllocationDonut({ slices, height = 180 }: Props) {
+export function AllocationDonut({ slices, height = 200 }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -23,13 +23,29 @@ export function AllocationDonut({ slices, height = 180 }: Props) {
           {
             data: slices.map((s) => s.value),
             backgroundColor: slices.map((s) => s.color),
-            borderWidth: 0,
+            borderColor: "#fff",
+            borderWidth: 3,
+            hoverOffset: 6,
           },
         ],
       },
       options: {
-        cutout: "68%",
-        plugins: { legend: { display: false } },
+        cutout: "72%",
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: "#0F1115",
+            padding: 10,
+            cornerRadius: 10,
+            titleFont: { size: 11, weight: 600 },
+            bodyFont: { size: 12, weight: 600 },
+            displayColors: true,
+            boxPadding: 4,
+            callbacks: {
+              label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`,
+            },
+          },
+        },
         responsive: true,
         maintainAspectRatio: false,
       },
