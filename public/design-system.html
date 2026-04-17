@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HashVault — Design System (Hearst tokens)</title>
+<style>
+  :root{
+    /* ===== PRIMITIVES — Hearst tokens (1:1 from hearstcorporation.io) ===== */
+    /* Mint green */
+    --mint-green-darkest:#324b2b;
+    --mint-green-darker:#426439;
+    --mint-green-dark:#85c873;
+    --mint-green:#a7fb90;
+    --mint-green-light:#c1fcb1;
+    --mint-green-lighter:#edfee8;
+    --mint-green-lightest:#f6fef3;
+    /* Gin (greenish neutrals) */
+    --gin-darkest:#454845;
+    --gin-darker:#5c605c;
+    --gin-dark:#b8c0b8;
+    --gin:#e6f1e7;
+    --gin-light:#edf5ee;
+    --gin-lighter:#fafcfa;
+    --gin-lightest:#fcfdfc;
+    /* Neutral */
+    --neutral-darkest:#000000;
+    --neutral-darker:#191919;
+    --neutral-dark:#4c4c4c;
+    --neutral:#7f7f7f;
+    --neutral-light:#b2b2b2;
+    --neutral-lighter:#d8d8d8;
+    --neutral-lightest:#f2f2f2;
+    --white:#ffffff;
+    /* Opacity (neutral-darkest) */
+    --nd-5:rgba(0,0,0,.05);
+    --nd-10:rgba(0,0,0,.10);
+    --nd-15:rgba(0,0,0,.15);
+    --nd-20:rgba(0,0,0,.20);
+    --nd-30:rgba(0,0,0,.30);
+    --nd-50:rgba(0,0,0,.50);
+
+    /* ===== UI STYLES ===== */
+    --r-sm:8px;
+    --r-md:8px;
+    --r-lg:16px; /* 1rem */
+    --stroke:1px;
+    --shadow-1:0 1px 2px rgba(0,0,0,.05);
+    --shadow-2:0 8px 32px rgba(50,75,43,.08);
+
+    /* ===== COLOR SCHEMES (Hearst exact) ===== */
+    /* Scheme 1 — white */
+    --c1-bg:var(--white);
+    --c1-fg:var(--white);
+    --c1-text:var(--neutral-darkest);
+    --c1-accent:var(--neutral-darkest);
+    --c1-border:var(--nd-15);
+    /* Scheme 2 — mint-green-dark bg (the "hero" green) */
+    --c2-bg:var(--mint-green-dark);
+    --c2-fg:var(--mint-green-dark);
+    --c2-text:var(--neutral-darkest);
+    --c2-accent:var(--neutral-darkest);
+    --c2-border:var(--nd-15);
+    /* Scheme 3 — mint lightest */
+    --c3-bg:var(--mint-green-lightest);
+    --c3-fg:var(--mint-green-lightest);
+    --c3-text:var(--neutral-darkest);
+    --c3-accent:var(--neutral-darkest);
+    --c3-border:var(--nd-15);
+    /* Scheme 4 — gin lightest */
+    --c4-bg:var(--gin-lightest);
+    --c4-fg:var(--gin-lightest);
+    --c4-text:var(--neutral-darkest);
+    --c4-accent:var(--neutral-darkest);
+    --c4-border:var(--nd-15);
+
+    /* Status (kept minimal — Hearst doesn't ship a real status palette) */
+    --status-pos:var(--mint-green-darker);
+    --status-neg:#b42318;
+  }
+
+  /* ============== BASE ============== */
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--gin-lightest);color:var(--neutral-darkest);
+    font-family:"Inter","Helvetica Neue","Helvetica","Ubuntu","Segoe UI","Verdana",Arial,sans-serif;
+    font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  a{color:var(--mint-green-darker);text-decoration:none}
+
+  /* ============== LAYOUT ============== */
+  .shell{max-width:1180px;margin:0 auto;padding:32px 24px 80px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;
+    padding:14px 20px;background:var(--white);border:var(--stroke) solid var(--c1-border);border-radius:var(--r-lg);margin-bottom:24px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:13px}
+  .logo-mark{width:24px;height:24px;border-radius:6px;background:var(--neutral-darkest);position:relative}
+  .logo-mark::after{content:"";position:absolute;inset:5px;border-radius:3px;background:var(--mint-green)}
+  .ds-section{background:var(--white);border:var(--stroke) solid var(--c1-border);border-radius:var(--r-lg);padding:24px;margin-bottom:20px}
+  .ds-section h2{margin:0 0 4px;font-size:18px;letter-spacing:-.01em}
+  .ds-section .lead{color:var(--neutral-dark);margin:0 0 20px;font-size:13px}
+  .ds-grid{display:grid;gap:16px}
+  .cols-2{grid-template-columns:1fr 1fr}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  .cols-4{grid-template-columns:repeat(4,1fr)}
+  .cols-5{grid-template-columns:repeat(5,1fr)}
+  .cols-7{grid-template-columns:repeat(7,1fr)}
+  @media(max-width:860px){.cols-2,.cols-3,.cols-4,.cols-5,.cols-7{grid-template-columns:1fr}}
+  h1{font-size:32px;margin:0 0 8px;letter-spacing:-.02em}
+  h3{font-size:11px;color:var(--neutral-dark);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin:0 0 8px}
+  .hint{font-size:12px;color:var(--neutral-dark)}
+  code.tok{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--neutral-dark);background:var(--neutral-lightest);padding:2px 6px;border-radius:4px}
+
+  /* ============== SWATCH ============== */
+  .swatch{border:var(--stroke) solid var(--c1-border);border-radius:var(--r-md);overflow:hidden;background:var(--white)}
+  .swatch .chip{height:80px}
+  .swatch .meta{padding:10px 12px}
+  .swatch .name{font-weight:600;font-size:12px}
+  .swatch .val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--neutral-dark);margin-top:2px;word-break:break-all}
+
+  /* ============== TYPE ============== */
+  .type-row{display:grid;grid-template-columns:120px 1fr 200px;gap:16px;align-items:baseline;padding:12px 0;border-bottom:1px dashed var(--c1-border)}
+  .type-row:last-child{border-bottom:0}
+  .type-row .label{font-size:11px;color:var(--neutral-dark);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  .type-row .meta{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--neutral-dark)}
+  .t-display{font-size:48px;font-weight:700;letter-spacing:-.03em;line-height:1.05}
+  .t-h1{font-size:32px;font-weight:700;letter-spacing:-.02em}
+  .t-h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .t-h3{font-size:16px;font-weight:600}
+  .t-body{font-size:14px}
+  .t-small{font-size:12px;color:var(--neutral-dark)}
+  .t-caps{font-size:11px;color:var(--neutral-dark);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+
+  /* ============== BUTTONS ============== */
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--mint-green);color:var(--neutral-darkest);
+    border:var(--stroke) solid var(--neutral-darkest);padding:10px 18px;border-radius:999px;font:inherit;font-weight:600;cursor:pointer;
+    transition:transform .05s, background .15s, color .15s}
+  .btn:hover{background:var(--mint-green-light)}
+  .btn:active{transform:translateY(1px)}
+  .btn.dark{background:var(--neutral-darkest);color:var(--white);border-color:var(--neutral-darkest)}
+  .btn.dark:hover{background:var(--neutral-darker)}
+  .btn.ghost{background:transparent;color:var(--neutral-darkest);border-color:var(--nd-20)}
+  .btn.ghost:hover{background:var(--neutral-lightest)}
+  .btn.outline-light{background:transparent;color:var(--white);border-color:rgba(255,255,255,.4)}
+  .btn.outline-light:hover{background:rgba(255,255,255,.08)}
+  .btn.sm{padding:6px 14px;font-size:13px}
+  .btn.lg{padding:14px 26px;font-size:15px}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+
+  /* ============== PILLS / CHIPS ============== */
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;
+    font-size:11px;font-weight:600;background:var(--mint-green-lighter);color:var(--mint-green-darkest);
+    border:var(--stroke) solid var(--mint-green-light);text-transform:uppercase;letter-spacing:.04em}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--mint-green-darker)}
+  .pill.neutral{background:var(--gin-light);color:var(--neutral-darkest);border-color:var(--gin-dark)}
+  .pill.dark{background:var(--neutral-darkest);color:var(--white);border-color:var(--neutral-darkest)}
+  .pill.dark .dot{background:var(--mint-green)}
+  .pill.warn{background:#fef3c7;color:#92400E;border-color:#fde68a}
+  .pill.danger{background:#fef3f2;color:#b42318;border-color:#fecaca}
+  .badge-risk{background:var(--gin);color:var(--neutral-darkest);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600}
+
+  /* ============== KPI ============== */
+  .kpi{font-size:32px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+  .kpi.sm{font-size:22px}
+  .kpi.lg{font-size:48px;letter-spacing:-.03em}
+  .kpi small{font-size:13px;font-weight:600;color:var(--neutral-dark);margin-left:6px}
+  .pos{color:var(--status-pos);font-weight:600}
+  .neg{color:var(--status-neg);font-weight:600}
+
+  /* ============== PROGRESS ============== */
+  .progress{height:6px;background:var(--gin);border-radius:999px;overflow:hidden}
+  .progress > span{display:block;height:100%;background:var(--mint-green-darker)}
+
+  /* ============== INPUTS ============== */
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:12px;font-weight:600;color:var(--neutral-dark)}
+  .input{display:flex;align-items:center;gap:10px;border:var(--stroke) solid var(--nd-20);border-radius:var(--r-md);
+    padding:12px 14px;background:var(--white);transition:border-color .15s, box-shadow .15s}
+  .input input{border:0;background:transparent;font:inherit;flex:1;outline:none;color:var(--neutral-darkest);min-width:0}
+  .input:focus-within{border-color:var(--mint-green-darker);box-shadow:0 0 0 3px rgba(50,75,43,.1)}
+  .input.amount input{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .input .ticker{font-weight:600;color:var(--neutral-dark)}
+  .chip-max{border:var(--stroke) solid var(--nd-15);background:var(--white);border-radius:var(--r-sm);padding:4px 10px;font-weight:600;font-size:12px;cursor:pointer}
+
+  /* ============== TABLE ============== */
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:14px 12px;border-bottom:var(--stroke) solid var(--c1-border);font-size:13px}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--neutral-dark);font-weight:600}
+  tr:last-child td{border-bottom:0}
+
+  /* ============== STEPPER ============== */
+  .stepper{display:flex;align-items:center;font-size:12px}
+  .stepper .step{display:flex;align-items:center;gap:8px;color:var(--neutral);font-weight:600}
+  .stepper .step .num{width:22px;height:22px;border-radius:50%;background:var(--gin);display:grid;place-items:center;font-size:11px;color:var(--neutral-darkest)}
+  .stepper .step.done .num{background:var(--mint-green-darker);color:var(--white)}
+  .stepper .step.current{color:var(--neutral-darkest)}
+  .stepper .step.current .num{background:var(--neutral-darkest);color:var(--white)}
+  .stepper .bar{flex:1;height:2px;background:var(--gin);margin:0 10px;border-radius:2px}
+  .stepper .bar.done{background:var(--mint-green-darker)}
+
+  /* ============== VAULT CARD ============== */
+  .vault-card{display:flex;flex-direction:column;gap:14px}
+  .facts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+    padding:14px 0;border-top:var(--stroke) solid var(--c1-border);border-bottom:var(--stroke) solid var(--c1-border)}
+  .fact .k{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--neutral-dark);font-weight:600}
+  .fact .v{font-size:14px;font-weight:600;margin-top:2px}
+
+  /* ============== WALLET ============== */
+  .wallet{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:var(--stroke) solid var(--nd-15);
+    border-radius:999px;font-weight:500;background:var(--white);font-size:12px}
+  .wallet .dot{width:7px;height:7px;border-radius:50%;background:var(--mint-green-darker)}
+
+  /* ============== STRATEGY BAR ============== */
+  .strat{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--gin)}
+  .strat span{display:block;height:100%}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--neutral-dark);margin-top:10px}
+  .legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle}
+
+  /* ============== TABS ============== */
+  nav.tabs{display:inline-flex;gap:4px;background:var(--gin);padding:4px;border-radius:999px}
+  nav.tabs button{border:0;background:transparent;padding:7px 16px;border-radius:999px;
+    font:inherit;font-weight:600;color:var(--neutral-dark);cursor:pointer;font-size:13px}
+  nav.tabs button.active{background:var(--white);color:var(--neutral-darkest);box-shadow:var(--shadow-1)}
+
+  /* ============== HERO (scheme 2 — mint-green-dark) ============== */
+  .hero{background:var(--mint-green-dark);border:var(--stroke) solid var(--c2-border);border-radius:var(--r-lg);padding:64px 32px;text-align:center;color:var(--neutral-darkest)}
+  .hero .pill{background:rgba(0,0,0,.06);color:var(--neutral-darkest);border-color:rgba(0,0,0,.12)}
+  .hero .pill .dot{background:var(--neutral-darkest)}
+  .hero h1{font-size:48px;letter-spacing:-.03em;margin:16px 0 14px;line-height:1.05;font-weight:700}
+  .hero p{color:rgba(0,0,0,.7);max-width:580px;margin:0 auto 28px;font-size:16px}
+
+  /* ============== SCHEME PREVIEW ============== */
+  .scheme{padding:24px;border-radius:var(--r-md);border:var(--stroke) solid var(--nd-15);min-height:140px;display:flex;flex-direction:column;justify-content:space-between}
+  .scheme h4{margin:0 0 4px;font-size:13px;font-weight:700}
+  .scheme .scheme-tag{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;opacity:.7}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="logo"><div class="logo-mark"></div><span>HASHVAULT</span></div>
+    <span class="hint">Design System · Hearst tokens · v0.2</span>
+    <div class="wallet"><span class="dot"></span>Validated palette</div>
+  </div>
+
+  <h1>HashVault — Design System</h1>
+  <p class="hint" style="margin-bottom:32px">Tokens 1:1 récupérés depuis <code class="tok">hearstcorporation.io</code> (Webflow `_primitives`). Mint Green + Gin (greenish neutrals) + Neutral.</p>
+
+  <!-- ============ COLORS ============ -->
+  <div class="ds-section">
+    <h2>Colors — Mint Green</h2>
+    <p class="lead">Famille primaire. <code class="tok">--mint-green</code> = #a7fb90 (action, accent). <code class="tok">--mint-green-dark</code> = #85c873 (hero). <code class="tok">--mint-green-darkest</code> = #324b2b (text accent).</p>
+    <div class="ds-grid cols-7">
+      <div class="swatch"><div class="chip" style="background:var(--mint-green-darkest)"></div><div class="meta"><div class="name">darkest</div><div class="val">#324b2b</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--mint-green-darker)"></div><div class="meta"><div class="name">darker</div><div class="val">#426439</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--mint-green-dark)"></div><div class="meta"><div class="name">dark</div><div class="val">#85c873</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--mint-green)"></div><div class="meta"><div class="name">base</div><div class="val">#a7fb90</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--mint-green-light)"></div><div class="meta"><div class="name">light</div><div class="val">#c1fcb1</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--mint-green-lighter)"></div><div class="meta"><div class="name">lighter</div><div class="val">#edfee8</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--mint-green-lightest)"></div><div class="meta"><div class="name">lightest</div><div class="val">#f6fef3</div></div></div>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <h2>Colors — Gin (greenish neutrals)</h2>
+    <p class="lead">Surfaces calmes, bordures, fond app. Tirent légèrement vers le vert pour rester en famille.</p>
+    <div class="ds-grid cols-7">
+      <div class="swatch"><div class="chip" style="background:var(--gin-darkest)"></div><div class="meta"><div class="name">darkest</div><div class="val">#454845</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--gin-darker)"></div><div class="meta"><div class="name">darker</div><div class="val">#5c605c</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--gin-dark)"></div><div class="meta"><div class="name">dark</div><div class="val">#b8c0b8</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--gin)"></div><div class="meta"><div class="name">base</div><div class="val">#e6f1e7</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--gin-light)"></div><div class="meta"><div class="name">light</div><div class="val">#edf5ee</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--gin-lighter)"></div><div class="meta"><div class="name">lighter</div><div class="val">#fafcfa</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--gin-lightest);border-bottom:1px solid var(--nd-15)"></div><div class="meta"><div class="name">lightest</div><div class="val">#fcfdfc</div></div></div>
+    </div>
+  </div>
+
+  <div class="ds-section">
+    <h2>Colors — Neutral</h2>
+    <p class="lead">Textes et surfaces neutres. <code class="tok">neutral-darkest</code> = noir pur (text body).</p>
+    <div class="ds-grid cols-7">
+      <div class="swatch"><div class="chip" style="background:var(--neutral-darkest)"></div><div class="meta"><div class="name">darkest</div><div class="val">#000000</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--neutral-darker)"></div><div class="meta"><div class="name">darker</div><div class="val">#191919</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--neutral-dark)"></div><div class="meta"><div class="name">dark</div><div class="val">#4c4c4c</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--neutral)"></div><div class="meta"><div class="name">base</div><div class="val">#7f7f7f</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--neutral-light)"></div><div class="meta"><div class="name">light</div><div class="val">#b2b2b2</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--neutral-lighter)"></div><div class="meta"><div class="name">lighter</div><div class="val">#d8d8d8</div></div></div>
+      <div class="swatch"><div class="chip" style="background:var(--neutral-lightest)"></div><div class="meta"><div class="name">lightest</div><div class="val">#f2f2f2</div></div></div>
+    </div>
+  </div>
+
+  <!-- ============ COLOR SCHEMES ============ -->
+  <div class="ds-section">
+    <h2>Color schemes (Hearst)</h2>
+    <p class="lead">4 contextes d'application. À utiliser via classes <code class="tok">scheme-1..4</code> sur les sections.</p>
+    <div class="ds-grid cols-4">
+      <div class="scheme" style="background:var(--c1-bg);color:var(--c1-text)">
+        <div><h4>Scheme 1 — White</h4><div class="scheme-tag">white · text:000 · border:nd-15</div></div>
+        <button class="btn sm">Action</button>
+      </div>
+      <div class="scheme" style="background:var(--c2-bg);color:var(--c2-text)">
+        <div><h4>Scheme 2 — Mint dark</h4><div class="scheme-tag">#85c873 · hero · CTA marketing</div></div>
+        <button class="btn sm dark">Action</button>
+      </div>
+      <div class="scheme" style="background:var(--c3-bg);color:var(--c3-text)">
+        <div><h4>Scheme 3 — Mint lightest</h4><div class="scheme-tag">#f6fef3 · highlight subtil</div></div>
+        <button class="btn sm">Action</button>
+      </div>
+      <div class="scheme" style="background:var(--c4-bg);color:var(--c4-text)">
+        <div><h4>Scheme 4 — Gin lightest</h4><div class="scheme-tag">#fcfdfc · fond app par défaut</div></div>
+        <button class="btn sm">Action</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TYPOGRAPHY ============ -->
+  <div class="ds-section">
+    <h2>Typography</h2>
+    <p class="lead">Hearst utilise <code class="tok">Fkgrotesktrial</code> (FK Grotesk Trial) — non distribuable. Fallback proche : <code class="tok">Inter</code> · <code class="tok">Helvetica Neue</code>.</p>
+
+    <div class="type-row"><div class="label">Display</div><div class="t-display">12% APY</div><div class="meta">48 / 700 / -0.03em</div></div>
+    <div class="type-row"><div class="label">H1</div><div class="t-h1">Institutional yield, on-chain</div><div class="meta">32 / 700 / -0.02em</div></div>
+    <div class="type-row"><div class="label">H2</div><div class="t-h2">Your vaults</div><div class="meta">22 / 700 / -0.01em</div></div>
+    <div class="type-row"><div class="label">H3 / lead</div><div class="t-h3">Portfolio value</div><div class="meta">16 / 600</div></div>
+    <div class="type-row"><div class="label">Body</div><div class="t-body">Daily user yield distribution. Audited institutional custody on Base.</div><div class="meta">14 / 400 / 1.5</div></div>
+    <div class="type-row"><div class="label">Small</div><div class="t-small">Distributed daily · USDC</div><div class="meta">12 / 400</div></div>
+    <div class="type-row"><div class="label">Caps / label</div><div class="t-caps">Lock period</div><div class="meta">11 / 600 / 0.06em</div></div>
+  </div>
+
+  <!-- ============ RADII ============ -->
+  <div class="ds-section">
+    <h2>Radii & shadows</h2>
+    <div class="ds-grid cols-3">
+      <div style="background:var(--gin);border-radius:var(--r-sm);padding:20px;text-align:center"><div class="t-caps">8px</div><div class="hint">--r-sm / --r-md</div></div>
+      <div style="background:var(--gin);border-radius:var(--r-lg);padding:20px;text-align:center"><div class="t-caps">16px</div><div class="hint">--r-lg (cards, hero)</div></div>
+      <div style="background:var(--gin);border-radius:999px;padding:20px;text-align:center"><div class="t-caps">999px</div><div class="hint">pills, buttons</div></div>
+    </div>
+    <div class="ds-grid cols-2" style="margin-top:16px">
+      <div style="background:#fff;border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-1)"><div class="t-caps">Shadow 1</div><div class="hint">subtle / button rest</div></div>
+      <div style="background:#fff;border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-2)"><div class="t-caps">Shadow 2</div><div class="hint">elevated card (mint-tinted)</div></div>
+    </div>
+  </div>
+
+  <!-- ============ BUTTONS ============ -->
+  <div class="ds-section">
+    <h2>Buttons</h2>
+    <p class="lead">Style Hearst : pill (radius 999), border noire fine, texte noir. Primaire = mint-green vif.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+      <button class="btn">Connect wallet</button>
+      <button class="btn lg">Launch app →</button>
+      <button class="btn sm">Select</button>
+      <button class="btn ghost">← Back</button>
+      <button class="btn dark">Read term sheet</button>
+      <button class="btn" disabled>Confirm deposit</button>
+    </div>
+    <p class="lead" style="margin-top:8px">Sur fond mint-dark (Scheme 2) :</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--mint-green-dark);padding:18px;border-radius:var(--r-md)">
+      <button class="btn dark">Start mining</button>
+      <button class="btn outline-light">Log in</button>
+    </div>
+  </div>
+
+  <!-- ============ PILLS / BADGES ============ -->
+  <div class="ds-section">
+    <h2>Pills & badges</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span class="pill"><span class="dot"></span>Live</span>
+      <span class="pill neutral">Audited</span>
+      <span class="pill dark"><span class="dot"></span>Base · USDC</span>
+      <span class="pill warn">Lock 36 months</span>
+      <span class="pill danger">Closed</span>
+      <span class="badge-risk">Moderate</span>
+      <span class="badge-risk">Growth</span>
+    </div>
+  </div>
+
+  <!-- ============ KPI / PROGRESS ============ -->
+  <div class="ds-section">
+    <h2>KPI & progress</h2>
+    <div class="ds-grid cols-3">
+      <div style="border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:20px">
+        <h3>Portfolio value</h3>
+        <div class="kpi">$ 752,340</div>
+        <div class="pos" style="margin-top:2px">+ $ 52,340 &nbsp; (+7.48%)</div>
+      </div>
+      <div style="border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:20px">
+        <h3>Yield earned to date</h3>
+        <div class="kpi">$ 42,180</div>
+        <div class="hint" style="margin-top:2px">USDC · distributed daily</div>
+      </div>
+      <div style="background:var(--mint-green-lightest);border:1px solid var(--mint-green-light);border-radius:var(--r-lg);padding:20px">
+        <h3>Target APY</h3>
+        <div class="kpi lg">12%<small>APY</small></div>
+        <div class="hint" style="margin-top:2px">HashVault Prime</div>
+      </div>
+    </div>
+    <div style="border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:20px;margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <strong>Cumulative target progress</strong><span class="hint">22% of 36%</span>
+      </div>
+      <div class="progress"><span style="width:61%"></span></div>
+      <div class="hint" style="margin-top:6px">Unlocks at 36% target reached <em>or</em> 3-year maturity.</div>
+    </div>
+  </div>
+
+  <!-- ============ INPUTS ============ -->
+  <div class="ds-section">
+    <h2>Inputs</h2>
+    <div class="ds-grid cols-2">
+      <div class="field">
+        <label>Amount (USDC)</label>
+        <div class="input amount">
+          <input type="text" value="500,000" />
+          <span class="ticker">USDC</span>
+          <button class="chip-max">Max</button>
+        </div>
+        <div class="hint">Wallet balance: 742,110 USDC</div>
+      </div>
+      <div class="field">
+        <label>Wallet address</label>
+        <div class="input">
+          <input type="text" value="0x7Ab…a3F2" readonly />
+          <span class="pill dark"><span class="dot"></span>Base</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ NAV / TABS / WALLET / STEPPER ============ -->
+  <div class="ds-section">
+    <h2>Navigation</h2>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:20px">
+      <nav class="tabs">
+        <button class="active">Dashboard</button>
+        <button>My Vaults</button>
+        <button>Invest</button>
+      </nav>
+      <span class="wallet"><span class="dot"></span>0x7Ab…a3F2</span>
+    </div>
+    <div class="stepper">
+      <div class="step done"><span class="num">✓</span>Select</div>
+      <div class="bar done"></div>
+      <div class="step current"><span class="num">2</span>Product</div>
+      <div class="bar"></div>
+      <div class="step"><span class="num">3</span>Deposit</div>
+      <div class="bar"></div>
+      <div class="step"><span class="num">4</span>Confirmed</div>
+    </div>
+  </div>
+
+  <!-- ============ VAULT CARDS ============ -->
+  <div class="ds-section">
+    <h2>Vault card (Invest · Step 1)</h2>
+    <p class="lead">Carte sobre, 1 hero KPI (APY), 3 facts, 1 CTA pill. Fond varie selon scheme.</p>
+    <div class="ds-grid cols-2">
+      <div class="vault-card" style="background:var(--white);border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:24px">
+        <span class="pill"><span class="dot"></span>Live</span>
+        <h2 class="t-h2" style="margin:6px 0 0">HashVault Prime</h2>
+        <div class="kpi lg" style="color:var(--mint-green-darkest)">12%<small>APY</small></div>
+        <p style="margin:0;color:var(--neutral-dark)">Steady monthly yield with built-in volatility buffer.</p>
+        <div class="facts">
+          <div class="fact"><div class="k">Lock</div><div class="v">3 years</div></div>
+          <div class="fact"><div class="k">Min deposit</div><div class="v">$500,000</div></div>
+          <div class="fact"><div class="k">Risk</div><div class="v">Moderate</div></div>
+        </div>
+        <button class="btn" style="align-self:flex-start">Select →</button>
+      </div>
+      <div class="vault-card" style="background:var(--mint-green-lightest);border:1px solid var(--mint-green-light);border-radius:var(--r-lg);padding:24px">
+        <span class="pill"><span class="dot"></span>Live</span>
+        <h2 class="t-h2" style="margin:6px 0 0">HashVault Growth</h2>
+        <div class="kpi lg" style="color:var(--mint-green-darkest)">15%<small>APY</small></div>
+        <p style="margin:0;color:var(--neutral-dark)">Bitcoin growth enhanced by mining-backed yield.</p>
+        <div class="facts" style="border-color:var(--mint-green-light)">
+          <div class="fact"><div class="k">Lock</div><div class="v">3 years</div></div>
+          <div class="fact"><div class="k">Min deposit</div><div class="v">$250,000</div></div>
+          <div class="fact"><div class="k">Risk</div><div class="v">Growth</div></div>
+        </div>
+        <button class="btn" style="align-self:flex-start">Select →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ STRATEGY ============ -->
+  <div class="ds-section">
+    <h2>Strategy allocation</h2>
+    <div style="border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:20px">
+      <div class="strat">
+        <span style="width:40%;background:var(--mint-green-darker)"></span>
+        <span style="width:30%;background:var(--mint-green-dark)"></span>
+        <span style="width:30%;background:var(--neutral-darkest)"></span>
+      </div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--mint-green-darker)"></span>RWA Mining 40%</span>
+        <span><span class="sw" style="background:var(--mint-green-dark)"></span>USDC Yield 30%</span>
+        <span><span class="sw" style="background:var(--neutral-darkest)"></span>BTC Hedged 30%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TABLE ============ -->
+  <div class="ds-section">
+    <h2>Table — Active vaults</h2>
+    <div style="border:1px solid var(--c1-border);border-radius:var(--r-lg);overflow:hidden">
+      <table>
+        <thead><tr>
+          <th style="padding-left:20px">Vault</th><th>Deposited</th><th>Value</th><th>APY</th><th>Lock progress</th><th>Next dist.</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td style="padding-left:20px"><strong>HashVault Prime #1</strong><div class="hint">Opened 12 Oct 2024 · Moderate</div></td>
+            <td>$ 500,000</td>
+            <td>$ 542,100 <span class="pos" style="font-size:11px">+8.4%</span></td>
+            <td>12%</td>
+            <td style="min-width:160px">
+              <div class="progress"><span style="width:50%"></span></div>
+              <div class="hint" style="margin-top:4px">18 / 36 months</div>
+            </td>
+            <td>Tomorrow · 00:00 UTC</td>
+          </tr>
+          <tr>
+            <td style="padding-left:20px"><strong>HashVault Growth #1</strong><div class="hint">Opened 12 Oct 2024 · Growth</div></td>
+            <td>$ 250,000</td>
+            <td>$ 260,240 <span class="pos" style="font-size:11px">+4.1%</span></td>
+            <td>15%</td>
+            <td style="min-width:160px">
+              <div class="progress"><span style="width:33%"></span></div>
+              <div class="hint" style="margin-top:4px">12 / 36 months</div>
+            </td>
+            <td>In 3 days</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ HERO PREVIEW ============ -->
+  <div class="ds-section">
+    <h2>Landing — hero preview (Scheme 2)</h2>
+    <div class="hero">
+      <span class="pill"><span class="dot"></span>Live · €40M+ deployed</span>
+      <h1>Institutional yield vaults<br/>powered by Bitcoin mining.</h1>
+      <p>Hybrid, infrastructure-backed yield. Audited custody, on-chain on Base, daily distribution. 12–15% target APY.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn dark lg">Launch app →</button>
+        <button class="btn outline-light lg">Read term sheet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER PREVIEW ============ -->
+  <div class="ds-section">
+    <h2>Footer</h2>
+    <div style="background:var(--white);border:1px solid var(--c1-border);border-radius:var(--r-lg);padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div class="logo"><div class="logo-mark"></div><span>HASHVAULT</span></div>
+      <div class="hint">© 2026 HashVault Connect · Term sheet · Privacy · Contact</div>
+      <span class="pill dark"><span class="dot"></span>Base · USDC</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

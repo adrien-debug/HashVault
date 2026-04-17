@@ -1,17 +1,35 @@
 {
-  "name": "hashvault-scaffold",
+  "name": "hashvault",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack -p 8000 -H 127.0.0.1",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8000 -H 127.0.0.1",
     "lint": "eslint"
   },
   "dependencies": {
+    "@reown/appkit": "^1.8.6",
+    "@reown/appkit-adapter-wagmi": "^1.8.6",
+    "@tanstack/react-query": "^5.99.0",
+    "@wagmi/connectors": "^5.10.2",
+    "@wagmi/core": "^2.21.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.8.0",
     "next": "16.2.4",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "recharts": "^3.8.1",
+    "tailwind-merge": "^3.5.0",
+    "viem": "^2.37.7",
+    "wagmi": "^2.17.2"
+  },
+  "overrides": {
+    "@wagmi/core": "^2.21.1",
+    "@wagmi/connectors": "^5.10.2",
+    "viem": "^2.37.7",
+    "wagmi": "^2.17.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

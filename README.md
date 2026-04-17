@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HashVault
 
-## Getting Started
+Application [Next.js 16](https://nextjs.org) (App Router, React 19, Tailwind v4, TypeScript).
+Frontend dans `app/`, mini backend via routes API (`app/api/`), couche Web3 dans
+`lib/web3/`, `lib/abi/`, `hooks/` et `providers/`.
 
-First, run the development server:
+## Pages
+
+| Route | Rôle | Données |
+|---|---|---|
+| `/` | Landing publique : hero + section produits + section "Why HashVault" + CTA "Launch App" + footer | Statique |
+| `/dashboard` | Dashboard demo (KPI, portfolio chart, allocation, liste vaults) | **Mocks** — preview design |
+| `/platform` | Liste des deux vaults (Prime + Growth) avec carte par vault | **On-chain** via `useVaultInfo` (fallback APR statique si vault non déployé) |
+| `/vault/[id]` | Page d'un vault : métriques, formulaire dépôt (Approve → Deposit), position user (Claim / Compound / Withdraw) | **On-chain** via `useVaultInfo`, `useUserVaultInfo`, `useUsdcAllowance/Approve`, `useDeposit`, `useClaimRewards`, `useRedepositRewards`, `useWithdraw` |
+| `/api/health` | Healthcheck JSON | — |
+
+Toutes les pages applicatives partagent `app/(app)/layout.tsx` (sidebar + bannière "wrong network" si chainId non supportée).
+
+## Démarrage
 
 ```bash
+npm install
+cp .env.example .env.local   # puis remplir au minimum NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrir **`http://127.0.0.1:8000`** — le serveur de dev est fixé sur le port **8000**
+et sur l’hôte **127.0.0.1** uniquement (voir `package.json`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Production locale après build :
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+Même port et même hôte : **8000** / **127.0.0.1**.
 
-To learn more about Next.js, take a look at the following resources:
+## Architecture Web3
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Dossier | Rôle |
+|---|---|
+| `lib/web3/env.ts` | Lecture des variables `NEXT_PUBLIC_*`, fallbacks, validation |
+| `lib/web3/contracts.ts` | Adresses USDC / VaultFactory / vaults Prime & Growth par chaîne |
+| `lib/web3/wagmi.ts` | Adapter `@reown/appkit-adapter-wagmi`, networks supportées |
+| `lib/abi/EpochVault.json` | ABI du contrat `EpochVault.sol` (vault USDC, epochs 30j) |
+| `lib/abi/VaultFactory.json` | ABI du contrat `VaultFactory.sol` |
+| `lib/abi/erc20.ts` | ABI ERC-20 minimal (allowance / approve / balance) |
+| `providers/Web3Provider.tsx` | `WagmiProvider` + `QueryClientProvider` + AppKit init |
+| `hooks/useVault.ts` | `useVaultInfo`, `useUserVaultInfo`, `useDeposit`, `useWithdraw`, `useClaimRewards`, `useRedepositRewards`, `useUsdcAllowance`, `useUsdcApprove`, `useExpectedRewards`, `useEmergencyWithdraw` |
+| `hooks/useFactory.ts` | `useDeployedVaults` |
+| `hooks/useNowSeconds.ts` | Horloge partagée (via `useSyncExternalStore`) pour countdowns / progress |
+| `lib/format.ts` | Helpers d'affichage (`formatUsd`, `formatNumber`, `formatDuration`, `shortenAddress`) |
+| `components/ConnectWalletButton.tsx` | CTA wallet (ouvre AppKit) |
+| `components/shared/NetworkBanner.tsx` | Bandeau d'avertissement "wrong network" |
+| `components/landing/*` | `Hero`, `Highlights`, `Footer`, `LandingNav` |
+| `components/platform/VaultCard.tsx` | Carte vault avec APR / total deposits / CTA |
+| `components/vault/VaultMetrics.tsx` | Métriques on-chain (APR, total, epoch courant, countdown) |
+| `components/vault/DepositCard.tsx` | Flow Approve → Deposit (input USDC, balance, est. reward) |
+| `components/vault/UserPositionCard.tsx` | Position user + Claim / Compound / Withdraw |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Networks supportées
 
-## Deploy on Vercel
+- **Base mainnet** (chainId `8453`) — cible production
+- **Base Sepolia** (chainId `84532`) — testnet par défaut
+- **Sepolia** (chainId `11155111`) — fallback dev (déploiement legacy)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Variables d'environnement
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Voir `.env.example`. Au minimum :
+
+- `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` — sans cette clé l'AppKit n'est pas initialisé.
+- `NEXT_PUBLIC_BASE_VAULT_PRIME_ADDRESS` / `NEXT_PUBLIC_BASE_VAULT_GROWTH_ADDRESS` — à
+  renseigner après déploiement des vaults sur Base. Les adresses USDC sont
+  pré-remplies (Circle USDC officiel).
+
+## API
+
+- `GET /api/health` → `{ "ok": true, "app": "HashVault" }`
+
+## Référence
+
+Le code Solidity et le front legacy se trouvent dans `external/` (cloné depuis les
+repos `SingularityDAO-dev/Meeneo-dapp` et `SingularityDAO-dev/meeneo-epoch-vault`).
+Ces dossiers sont en lecture seule — ils ne servent qu'à comprendre le contrat et
+sont ignorés par git.
